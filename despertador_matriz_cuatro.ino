@@ -1,6 +1,6 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
-
+#include <TimeLib.h>
 // Definición de la clase Reloj
 class Reloj {
 public:
@@ -87,6 +87,8 @@ unsigned long tiempoInicio = millis();
 
 char caracter = 'E';
 
+char diasDeLaSemana[] = {'D', 'L', 'M', 'M', 'J', 'V', 'S'}; 
+
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
     tiempoInicio = millis();
@@ -102,24 +104,10 @@ void mostrarHora() {
   }
 }
 
-void actualizarHora() {
-  if (ejecutarCada(60000)) {
-    if (min > 58) {
-      min = 0;
-      if (hora > 22) {
-        hora = 0;
-      } else {
-        hora++;
-      }
-    } else {
-      min++;
-    }
-    miReloj.setMinutos(min);
-    miReloj.setHora(hora);
-  }
-}
 
-void setup() {
+
+void setup() {  
+  setTime(6, 26, 0, 22, 12, 2023);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
   pinMode(button3, INPUT_PULLUP);
@@ -140,13 +128,19 @@ void setup() {
 
   // Mostrar la cara feliz al inicio
   matrix.fillScreen(LOW);  // Limpiar el display
-  miReloj.setMinutos(min);
-  miReloj.setHora(hora);
+  miReloj.setMinutos(minute());
+  miReloj.setHora(hour());
   matrix.write();
 }
 
 void loop() {
-  actualizarHora();
+ 
+  if (ejecutarCada(1000)) {
+    time_t tiempoActual = now();    
+    miReloj.setMinutos(minute(tiempoActual));
+    miReloj.setHora(hour(tiempoActual));
+    caracter = diasDeLaSemana[weekday(tiempoActual)-1];
+  }
   matrix.fillScreen(LOW);
   mostrarHora();
   matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
