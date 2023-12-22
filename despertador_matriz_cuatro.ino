@@ -4,6 +4,7 @@
 // Definición de la clase Reloj
 class Reloj {
 public:
+  int horaMostrar;
   int hora;
   int minutos;
   int alarma;
@@ -18,8 +19,20 @@ public:
   }
 
   // Métodos para establecer y obtener los valores
+  void setDisplay(){
+    String strHora = String(hora);
+    String strMinutos = String(minutos);
+    String strHoraMostrar = strHora + strMinutos;
+    horaMostrar = strHoraMostrar.toInt();
+  }
+
+  int getDisplay(){
+    return horaMostrar;
+  }
+
   void setHora(int h) {
     hora = h;
+    setDisplay();
   }
 
   int getHora() {
@@ -28,6 +41,7 @@ public:
 
   void setMinutos(int m) {
     minutos = m;
+    setDisplay();
   }
 
   int getMinutos() {
@@ -53,6 +67,9 @@ public:
 
 Reloj miReloj;
 
+int min = 0;
+int hora = 0;
+
 
 
 
@@ -68,7 +85,7 @@ const int button3 = 5;
 const int button4 = 6;
 const int button5 = 2;
 unsigned long tiempoInicio = millis();
-int hora = 0000;
+//int hora = 00;
 char strHora[5];
 char caracter = 'M';
 
@@ -107,19 +124,28 @@ void setup() {
 }
 
 void loop() {
-  
-  if (hora > 9999) {
-    hora = 0000;
+
+
+  if (ejecutarCada(100)) {
+    if (min >= 60) {
+      min = 0;
+    } else {
+      min++;
+    }
+    miReloj.setMinutos(min);
   }
 
-  if(ejecutarCada(10)){
-    hora ++;
-  }
+
+
+
+
+
+
 
 
   // Convertir la hora a una cadena de texto
 
-  sprintf(strHora, "%04d", hora);
+  sprintf(strHora, "%04d", miReloj.getDisplay());
 
   // Limpiar el display
   matrix.fillScreen(LOW);
