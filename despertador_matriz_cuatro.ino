@@ -85,7 +85,7 @@ const int button4 = 6;
 const int button5 = 2;
 unsigned long tiempoInicio = millis();
 
-char caracter = 'M';
+char caracter = 'E';
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -93,6 +93,29 @@ bool ejecutarCada(int tiempo) {
     return true;
   } else {
     return false;
+  }
+}
+
+void mostrarHora() {
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
+  }
+}
+
+void actualizarHora() {
+  if (ejecutarCada(1000)) {
+    if (min > 58) {
+      min = 0;
+      if (hora > 22) {
+        hora = 0;
+      } else {
+        hora++;
+      }
+    } else {
+      min++;
+    }
+    miReloj.setMinutos(min);
+    miReloj.setHora(hora);
   }
 }
 
@@ -121,37 +144,9 @@ void setup() {
 }
 
 void loop() {
-  if (ejecutarCada(300)) {
-    if (min > 59) {
-      min = 0;
-      if (hora > 23) {
-        hora = 0;
-      } else {
-        hora++;
-      }
-    } else {
-      min++;
-    }
-    miReloj.setMinutos(min);
-    miReloj.setHora(hora);
-  }
-
-  // Limpiar el display
+  actualizarHora();
   matrix.fillScreen(LOW);
-
-  // Dibujar cada dígito de la hora
-  for (int i = 0; i < 4; i++) {
-    matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
-  }
-
-  // Supongamos que 'M' es el carácter que quieres mostrar
-
-  // Dibujar el carácter en el último módulo
+  mostrarHora();
   matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
-
-  // Actualizar el display
   matrix.write();
-
-  // Esperar un segundo antes de actualizar la hora
-  //delay(10);
 }
