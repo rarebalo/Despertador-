@@ -4,7 +4,7 @@
 // Definición de la clase Reloj
 class Reloj {
 public:
-  int horaMostrar;
+  char horaMostrar[5];
   int hora;
   int minutos;
   int alarma;
@@ -19,14 +19,16 @@ public:
   }
 
   // Métodos para establecer y obtener los valores
-  void setDisplay(){
-    String strHora = String(hora);
-    String strMinutos = String(minutos);
-    String strHoraMostrar = strHora + strMinutos;
-    horaMostrar = strHoraMostrar.toInt();
+  void setDisplay() {
+    char strHora[3];
+    char strMinutos[3];
+    sprintf(strHora, "%02d", hora);
+    sprintf(strMinutos, "%02d", minutos);
+    String strHoraMostrar = String(strHora) + String(strMinutos);
+    sprintf(horaMostrar, "%s", strHoraMostrar.c_str());
   }
 
-  int getDisplay(){
+  char* getDisplay() {
     return horaMostrar;
   }
 
@@ -70,9 +72,6 @@ Reloj miReloj;
 int min = 0;
 int hora = 0;
 
-
-
-
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
 const int numberOfVerticalDisplays = 1;
@@ -85,8 +84,7 @@ const int button3 = 5;
 const int button4 = 6;
 const int button5 = 2;
 unsigned long tiempoInicio = millis();
-//int hora = 00;
-char strHora[5];
+
 char caracter = 'M';
 
 bool ejecutarCada(int tiempo) {
@@ -97,7 +95,6 @@ bool ejecutarCada(int tiempo) {
     return false;
   }
 }
-
 
 void setup() {
   pinMode(button1, INPUT_PULLUP);
@@ -124,39 +121,30 @@ void setup() {
 }
 
 void loop() {
-
-
-  if (ejecutarCada(100)) {
-    if (min >= 60) {
+  if (ejecutarCada(300)) {
+    if (min > 59) {
       min = 0;
+      if (hora > 23) {
+        hora = 0;
+      } else {
+        hora++;
+      }
     } else {
       min++;
     }
     miReloj.setMinutos(min);
+    miReloj.setHora(hora);
   }
-
-
-
-
-
-
-
-
-
-  // Convertir la hora a una cadena de texto
-
-  sprintf(strHora, "%04d", miReloj.getDisplay());
 
   // Limpiar el display
   matrix.fillScreen(LOW);
 
   // Dibujar cada dígito de la hora
   for (int i = 0; i < 4; i++) {
-    matrix.drawChar(i * 6, 0, strHora[i], HIGH, LOW, 1);
+    matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
   }
 
   // Supongamos que 'M' es el carácter que quieres mostrar
-
 
   // Dibujar el carácter en el último módulo
   matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
