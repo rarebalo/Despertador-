@@ -13,54 +13,6 @@ const int button3 = 5;
 const int button4 = 6;
 const int button5 = 2;
 
-// Datos de la imagen de la cara feliz
-const uint8_t caraFeliz[] PROGMEM = {
-  B00111100,
-  B01000010,
-  B10100101,
-  B10000001,
-  B10100101,
-  B10011001,
-  B01000010,
-  B00111100
-};
-
-// Datos de la imagen de la cara triste
-const uint8_t caraTriste[] PROGMEM = {
-  B00111100,
-  B01000010,
-  B10100101,
-  B10000001,
-  B10011001,
-  B10100101,
-  B01000010,
-  B00111100
-};
-
-// Datos de la imagen de la cara durmiendo
-const uint8_t caraDurmiendo[] PROGMEM = {
-    B00111100,
-    B01000010,
-    B10100101,
-    B10000001,
-    B10111101,
-    B10000001,
-    B01011010,
-    B00111100
-};
-
-// Datos de la imagen de la media luna
-const uint8_t mediaLuna[] PROGMEM = {
-    B00001100,
-    B00011110,
-    B00110011,
-    B01100001,
-    B01100001,
-    B00110011,
-    B00011110,
-    B00001100
-};
-
 bool durmiendo = false;
 bool triste = false;
 int brillo = 0;
