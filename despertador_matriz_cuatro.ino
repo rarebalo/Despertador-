@@ -13,10 +13,6 @@ const int button3 = 5;
 const int button4 = 6;
 const int button5 = 2;
 
-bool durmiendo = false;
-bool triste = false;
-int brillo = 0;
-int incrementoBrillo = 1;
 
 void setup() {
     pinMode(button1, INPUT_PULLUP);
@@ -26,7 +22,7 @@ void setup() {
     pinMode(button5, INPUT_PULLUP);
     pinMode(buzzer, OUTPUT);
 
-    matrix.setIntensity(brillo);
+    matrix.setIntensity(0);
     matrix.setPosition(0 ,0 ,0 );
     matrix.setPosition(1 ,1 ,0 );
     matrix.setPosition(2 ,2 ,0 );
@@ -39,81 +35,34 @@ void setup() {
 
     // Mostrar la cara feliz al inicio
     matrix.fillScreen(LOW); // Limpiar el display
-    matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
     matrix.write();
 }
 
 void loop() {
-     // Cambiar el brillo del display gradualmente
-     if (!triste) {
-         brillo += incrementoBrillo;
-         if (brillo >= (durmiendo ? -3 :15)) {
-             incrementoBrillo = -1;
-         } else if (brillo <= (durmiendo ? -7 :-7)) {
-             incrementoBrillo = +1;
-         }
-         matrix.setIntensity(brillo + (durmiendo ? -3 :0));
-     } else {
-         matrix.setIntensity(-15);
-     }
-     
-     // Verificar si se presionó el botón para cambiar a la cara triste
-     if (digitalRead(button5) == LOW && !durmiendo) {
-         delay(20); // Agregar un pequeño retardo para estabilizar las señales
-         if (digitalRead(button5) == LOW) {
-             // Mostrar la cara triste
-             triste = true;
-             matrix.fillScreen(LOW); // Limpiar el display
-             matrix.drawBitmap(0,0,caraTriste ,8 ,8 ,HIGH );
-             matrix.write();
-             // Emitir un sonido triste
-             tone(buzzer ,300 ,500 );
-             delay(500);
-             tone(buzzer ,250 ,500 );
-             delay(500); 
-             // Esperar durante cinco segundos
-             delay(5000);
-             // Volver a mostrar la cara feliz
-             triste = false;
-             matrix.fillScreen(LOW); // Limpiar el display
-             matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
-             matrix.write();
-             // Emitir un sonido feliz
-             tone(buzzer ,500 ,500 );
-             delay(500);
-             tone(buzzer ,600 ,500 );
-             delay(500); 
-         }
-     }
-     // Verificar si se presionó el botón para cambiar a la cara durmiendo o para despertar
-     if (digitalRead(button4) == LOW) {
-         delay(20); // Agregar un pequeño retardo para estabilizar las señales
-         if (digitalRead(button4) == LOW) {
-             if (!durmiendo) {
-                 // Mostrar la cara durmiendo
-                 matrix.fillScreen(LOW); // Limpiar el display
-                 matrix.drawBitmap(0,0,caraDurmiendo ,8 ,8 ,HIGH );
-                 matrix.drawBitmap(16, 0, mediaLuna, 8, 8, HIGH);
-                 matrix.write();
-                 // Emitir un sonido de dormir
-                 tone(buzzer ,200 ,500 );
-                 delay(500);
-                 tone(buzzer ,150 ,500 );
-                 delay(500); 
-                 durmiendo = true;
-             } else {
-                 // Mostrar la cara feliz
-                 matrix.fillScreen(LOW); // Limpiar el display
-                 matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
-                 matrix.write();
-                 // Emitir un sonido feliz
-                 tone(buzzer ,500 ,500 );
-                 delay(500);
-                 tone(buzzer ,600 ,500 );
-                 delay(500); 
-                 durmiendo = false;
-             }
-         }
-     }
-     delay(durmiendo ? 100 : 10);
+    // Supongamos que esta es la hora actual en formato de 24 horas
+    int hora = 5678; // 12:34
+
+    // Convertir la hora a una cadena de texto
+    char strHora[5];
+    sprintf(strHora, "%04d", hora);
+
+    // Limpiar el display
+    matrix.fillScreen(LOW);
+
+    // Dibujar cada dígito de la hora
+    for (int i = 0; i < 4; i++) {
+        matrix.drawChar(i * 6, 0, strHora[i], HIGH, LOW, 1);
+    }
+
+    // Supongamos que 'M' es el carácter que quieres mostrar
+    char caracter = 'M';
+
+    // Dibujar el carácter en el último módulo
+    matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
+
+    // Actualizar el display
+    matrix.write();
+
+    // Esperar un segundo antes de actualizar la hora
+    delay(1000);
 }
