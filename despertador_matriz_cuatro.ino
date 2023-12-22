@@ -103,7 +103,7 @@ void mostrarHora() {
 }
 
 void actualizarHora() {
-  if (ejecutarCada(1000)) {
+  if (ejecutarCada(60000)) {
     if (min > 58) {
       min = 0;
       if (hora > 22) {
@@ -140,6 +140,8 @@ void setup() {
 
   // Mostrar la cara feliz al inicio
   matrix.fillScreen(LOW);  // Limpiar el display
+  miReloj.setMinutos(min);
+  miReloj.setHora(hora);
   matrix.write();
 }
 
