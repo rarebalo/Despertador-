@@ -1,6 +1,61 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 
+// Definición de la clase Reloj
+class Reloj {
+public:
+  int hora;
+  int minutos;
+  int alarma;
+  bool sonar;
+
+  // Constructor
+  Reloj() {
+    hora = 0;
+    minutos = 0;
+    alarma = 0;
+    sonar = false;
+  }
+
+  // Métodos para establecer y obtener los valores
+  void setHora(int h) {
+    hora = h;
+  }
+
+  int getHora() {
+    return hora;
+  }
+
+  void setMinutos(int m) {
+    minutos = m;
+  }
+
+  int getMinutos() {
+    return minutos;
+  }
+
+  void setAlarma(int a) {
+    alarma = a;
+  }
+
+  int getAlarma() {
+    return alarma;
+  }
+
+  void setSonar(bool s) {
+    sonar = s;
+  }
+
+  bool getSonar() {
+    return sonar;
+  }
+};
+
+Reloj miReloj;
+
+
+
+
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
 const int numberOfVerticalDisplays = 1;
@@ -15,15 +70,14 @@ const int button5 = 2;
 unsigned long tiempoInicio = millis();
 int hora = 0000;
 char strHora[5];
- char caracter = 'M';
+char caracter = 'M';
 
-int ejecutarCada(int tiempo, int valor) {
+bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
-    valor++;
     tiempoInicio = millis();
-    return valor;
+    return true;
   } else {
-    return valor;
+    return false;
   }
 }
 
@@ -53,16 +107,18 @@ void setup() {
 }
 
 void loop() {
-
-  if(hora>9999){
+  
+  if (hora > 9999) {
     hora = 0000;
   }
 
-  hora = ejecutarCada(50, hora);
+  if(ejecutarCada(10)){
+    hora ++;
+  }
 
 
-    // Convertir la hora a una cadena de texto
-    
+  // Convertir la hora a una cadena de texto
+
   sprintf(strHora, "%04d", hora);
 
   // Limpiar el display
@@ -74,7 +130,7 @@ void loop() {
   }
 
   // Supongamos que 'M' es el carácter que quieres mostrar
- 
+
 
   // Dibujar el carácter en el último módulo
   matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
