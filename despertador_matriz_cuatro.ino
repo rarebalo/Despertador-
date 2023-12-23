@@ -126,8 +126,8 @@ void setup() {
   matrix.setRotation(2, 1);
   matrix.setRotation(3, 1);
 
-  // Mostrar la cara feliz al inicio
-  matrix.fillScreen(LOW);  // Limpiar el display
+ 
+  matrix.fillScreen(LOW);  
   miReloj.setMinutos(minute());
   miReloj.setHora(hour());
   matrix.write();
