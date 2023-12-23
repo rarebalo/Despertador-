@@ -1,5 +1,76 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
+#include <TimeLib.h>
+// Definición de la clase Reloj
+class Reloj {
+public:
+  char horaMostrar[5];
+  int hora;
+  int minutos;
+  int alarma;
+  bool sonar;
+
+  // Constructor
+  Reloj() {
+    hora = 0;
+    minutos = 0;
+    alarma = 0;
+    sonar = false;
+  }
+
+  // Métodos para establecer y obtener los valores
+  void setDisplay() {
+    char strHora[3];
+    char strMinutos[3];
+    sprintf(strHora, "%02d", hora);
+    sprintf(strMinutos, "%02d", minutos);
+    String strHoraMostrar = String(strHora) + String(strMinutos);
+    sprintf(horaMostrar, "%s", strHoraMostrar.c_str());
+  }
+
+  char* getDisplay() {
+    return horaMostrar;
+  }
+
+  void setHora(int h) {
+    hora = h;
+    setDisplay();
+  }
+
+  int getHora() {
+    return hora;
+  }
+
+  void setMinutos(int m) {
+    minutos = m;
+    setDisplay();
+  }
+
+  int getMinutos() {
+    return minutos;
+  }
+
+  void setAlarma(int a) {
+    alarma = a;
+  }
+
+  int getAlarma() {
+    return alarma;
+  }
+
+  void setSonar(bool s) {
+    sonar = s;
+  }
+
+  bool getSonar() {
+    return sonar;
+  }
+};
+
+Reloj miReloj;
+
+int min = 0;
+int hora = 0;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -12,156 +83,66 @@ const int button2 = 4;
 const int button3 = 5;
 const int button4 = 6;
 const int button5 = 2;
+unsigned long tiempoInicio = millis();
 
-// Datos de la imagen de la cara feliz
-const uint8_t caraFeliz[] PROGMEM = {
-  B00111100,
-  B01000010,
-  B10100101,
-  B10000001,
-  B10100101,
-  B10011001,
-  B01000010,
-  B00111100
-};
+char caracter = 'E';
 
-// Datos de la imagen de la cara triste
-const uint8_t caraTriste[] PROGMEM = {
-  B00111100,
-  B01000010,
-  B10100101,
-  B10000001,
-  B10011001,
-  B10100101,
-  B01000010,
-  B00111100
-};
+char diasDeLaSemana[] = {'D', 'L', 'M', 'M', 'J', 'V', 'S'}; 
 
-// Datos de la imagen de la cara durmiendo
-const uint8_t caraDurmiendo[] PROGMEM = {
-    B00111100,
-    B01000010,
-    B10100101,
-    B10000001,
-    B10111101,
-    B10000001,
-    B01011010,
-    B00111100
-};
+bool ejecutarCada(int tiempo) {
+  if (millis() - tiempoInicio >= tiempo) {
+    tiempoInicio = millis();
+    return true;
+  } else {
+    return false;
+  }
+}
 
-// Datos de la imagen de la media luna
-const uint8_t mediaLuna[] PROGMEM = {
-    B00001100,
-    B00011110,
-    B00110011,
-    B01100001,
-    B01100001,
-    B00110011,
-    B00011110,
-    B00001100
-};
+void mostrarHora() {
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
+  }
+}
 
-bool durmiendo = false;
-bool triste = false;
-int brillo = 0;
-int incrementoBrillo = 1;
 
-void setup() {
-    pinMode(button1, INPUT_PULLUP);
-    pinMode(button2, INPUT_PULLUP);
-    pinMode(button3, INPUT_PULLUP);
-    pinMode(button4, INPUT_PULLUP);
-    pinMode(button5, INPUT_PULLUP);
-    pinMode(buzzer, OUTPUT);
 
-    matrix.setIntensity(brillo);
-    matrix.setPosition(0 ,0 ,0 );
-    matrix.setPosition(1 ,1 ,0 );
-    matrix.setPosition(2 ,2 ,0 );
-    matrix.setPosition(3 ,3 ,0 );
+void setup() {  
+  setTime(6, 26, 0, 22, 12, 2023);
+  pinMode(button1, INPUT_PULLUP);
+  pinMode(button2, INPUT_PULLUP);
+  pinMode(button3, INPUT_PULLUP);
+  pinMode(button4, INPUT_PULLUP);
+  pinMode(button5, INPUT_PULLUP);
+  pinMode(buzzer, OUTPUT);
 
-    matrix.setRotation(0 ,1 );
-    matrix.setRotation(1 ,1 );
-    matrix.setRotation(2 ,1 );
-    matrix.setRotation(3 ,1 );
+  matrix.setIntensity(0);
+  matrix.setPosition(0, 0, 0);
+  matrix.setPosition(1, 1, 0);
+  matrix.setPosition(2, 2, 0);
+  matrix.setPosition(3, 3, 0);
 
-    // Mostrar la cara feliz al inicio
-    matrix.fillScreen(LOW); // Limpiar el display
-    matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
-    matrix.write();
+  matrix.setRotation(0, 1);
+  matrix.setRotation(1, 1);
+  matrix.setRotation(2, 1);
+  matrix.setRotation(3, 1);
+
+  // Mostrar la cara feliz al inicio
+  matrix.fillScreen(LOW);  // Limpiar el display
+  miReloj.setMinutos(minute());
+  miReloj.setHora(hour());
+  matrix.write();
 }
 
 void loop() {
-     // Cambiar el brillo del display gradualmente
-     if (!triste) {
-         brillo += incrementoBrillo;
-         if (brillo >= (durmiendo ? -3 :15)) {
-             incrementoBrillo = -1;
-         } else if (brillo <= (durmiendo ? -7 :-7)) {
-             incrementoBrillo = +1;
-         }
-         matrix.setIntensity(brillo + (durmiendo ? -3 :0));
-     } else {
-         matrix.setIntensity(-15);
-     }
-     
-     // Verificar si se presionó el botón para cambiar a la cara triste
-     if (digitalRead(button5) == LOW && !durmiendo) {
-         delay(20); // Agregar un pequeño retardo para estabilizar las señales
-         if (digitalRead(button5) == LOW) {
-             // Mostrar la cara triste
-             triste = true;
-             matrix.fillScreen(LOW); // Limpiar el display
-             matrix.drawBitmap(0,0,caraTriste ,8 ,8 ,HIGH );
-             matrix.write();
-             // Emitir un sonido triste
-             tone(buzzer ,300 ,500 );
-             delay(500);
-             tone(buzzer ,250 ,500 );
-             delay(500); 
-             // Esperar durante cinco segundos
-             delay(5000);
-             // Volver a mostrar la cara feliz
-             triste = false;
-             matrix.fillScreen(LOW); // Limpiar el display
-             matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
-             matrix.write();
-             // Emitir un sonido feliz
-             tone(buzzer ,500 ,500 );
-             delay(500);
-             tone(buzzer ,600 ,500 );
-             delay(500); 
-         }
-     }
-     // Verificar si se presionó el botón para cambiar a la cara durmiendo o para despertar
-     if (digitalRead(button4) == LOW) {
-         delay(20); // Agregar un pequeño retardo para estabilizar las señales
-         if (digitalRead(button4) == LOW) {
-             if (!durmiendo) {
-                 // Mostrar la cara durmiendo
-                 matrix.fillScreen(LOW); // Limpiar el display
-                 matrix.drawBitmap(0,0,caraDurmiendo ,8 ,8 ,HIGH );
-                 matrix.drawBitmap(16, 0, mediaLuna, 8, 8, HIGH);
-                 matrix.write();
-                 // Emitir un sonido de dormir
-                 tone(buzzer ,200 ,500 );
-                 delay(500);
-                 tone(buzzer ,150 ,500 );
-                 delay(500); 
-                 durmiendo = true;
-             } else {
-                 // Mostrar la cara feliz
-                 matrix.fillScreen(LOW); // Limpiar el display
-                 matrix.drawBitmap(0,0,caraFeliz ,8 ,8 ,HIGH );
-                 matrix.write();
-                 // Emitir un sonido feliz
-                 tone(buzzer ,500 ,500 );
-                 delay(500);
-                 tone(buzzer ,600 ,500 );
-                 delay(500); 
-                 durmiendo = false;
-             }
-         }
-     }
-     delay(durmiendo ? 100 : 10);
+ 
+  if (ejecutarCada(1000)) {
+    time_t tiempoActual = now();    
+    miReloj.setMinutos(minute(tiempoActual));
+    miReloj.setHora(hour(tiempoActual));
+    caracter = diasDeLaSemana[weekday(tiempoActual)-1];
+  }
+  matrix.fillScreen(LOW);
+  mostrarHora();
+  matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
+  matrix.write();
 }
