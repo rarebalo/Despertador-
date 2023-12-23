@@ -1,6 +1,8 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
+#define DEBOUNCE_DELAY 50 // Tiempo de rebote en milisegundos
+
 // Definición de la clase Reloj
 class Reloj {
 public:
@@ -67,6 +69,9 @@ public:
   }
 };
 
+unsigned long lastButton1Press = 0; // Última vez que se presionó el botón 1
+// Añade más variables para más botones
+
 Reloj miReloj;
 
 int min = 0;
@@ -107,7 +112,7 @@ void mostrarHora() {
 
 
 void setup() {  
-  setTime(6, 26, 0, 22, 12, 2023);
+  setTime(6, 32, 0, 23, 12, 2023);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
   pinMode(button3, INPUT_PULLUP);
@@ -134,6 +139,15 @@ void setup() {
 }
 
 void loop() {
+
+    // Comprueba si el botón 1 ha sido presionado
+  if (digitalRead(button1) == LOW) {
+    unsigned long currentMillis = millis();
+    if (currentMillis - lastButton1Press > DEBOUNCE_DELAY) {
+      lastButton1Press = currentMillis;
+      // Aquí va el código que se ejecutará cuando se presione el botón 1
+    }
+  }
  
   if (ejecutarCada(1000)) {
     time_t tiempoActual = now();    
