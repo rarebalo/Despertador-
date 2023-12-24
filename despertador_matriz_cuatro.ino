@@ -209,6 +209,10 @@ void ajustarAlarma() {
     alarmaMin = 0;
    }
   }
+  
+  miReloj.setHoraAlarma(alarmaHora);
+  miReloj.setMinutosAlarma(alarmaMin);
+
 }
 
 void pantallaHora() {
@@ -217,6 +221,9 @@ void pantallaHora() {
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
+  }
+  if(sonarAlarma()){
+   caracter = '*';
   }
   matrix.fillScreen(LOW);
   mostrarHora();
@@ -249,6 +256,21 @@ void cambiarModo() {
   modo++;
   if (modo > 2) {
     modo = 0;
+  }
+}
+
+bool sonarAlarma(){
+  if(miReloj.horaAlarma == miReloj.hora && miReloj.minutosAlarma == miReloj.minutos && miReloj.sonar){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+void subirBrillo(){
+  brillo++;
+  if(brillo==16){
+    brillo = 0;
   }
 }
 
@@ -288,6 +310,9 @@ void loop() {
     case 0:
       matrix.setIntensity(0);
       pantallaHora();
+      if(sonarAlarma() && ejecutarCada(200)){
+        subirBrillo();
+      }
       break;
     case 1:
       matrix.setIntensity(3);
