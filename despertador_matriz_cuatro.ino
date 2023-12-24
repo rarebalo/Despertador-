@@ -2,6 +2,8 @@
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
 #include <TimeAlarms.h>
+#include <EasyBuzzer.h>
+
 
 // Definición de la clase Reloj
 class Reloj {
@@ -69,10 +71,8 @@ public:
   }
 };
 
-const int tiempoRebote = 200;
+const int tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
-// Última vez que se presionó el botón 1
-// Añade más variables para más botones
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
@@ -94,12 +94,14 @@ const int button2 = 5;
 const int button3 = 6;
 const int button4 = 2;
 unsigned long tiempoInicio = millis();
+unsigned long esperaEntreSonidos = 1000;
 int modo = 0;
 int brillo = 0;
-
 char caracter = 'E';
-
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
+
+void reproducirMelodia() {
+}
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -187,16 +189,24 @@ void pantallaHora() {
   matrix.write();
 }
 
-/*void alarma() {
+void alarma() {
   // Este es el código que se ejecutará cuando suene la alarma
-  digitalWrite(buzzer, HIGH);  // Enciende el buzzer
-  delay(1000);                    // Espera un segundo
-  digitalWrite(buzzer, LOW);   // Apaga el buzzer
-}*/
-
+  EasyBuzzer.beep(
+    2000,  // Frecuencia en Hz
+    500,   // Duración del beep en milisegundos
+    1000,  // Tiempo de espera entre beeps en milisegundos
+    2,     // Cantidad de repeticiones del beep
+    1000,  // Tiempo de espera entre ciclos de beeps en milisegundos
+    1      // Cantidad de ciclos de beeps
+  );
+}
 
 void setup() {
-  setTime(6, 32, 0, 23, 12, 2023);
+  EasyBuzzer.setPin(buzzer);
+  EasyBuzzer.beep(500, 2);
+  setTime(9, 20, 0, 24, 12, 2023);
+  Alarm.alarmRepeat(9, 21, 0, alarma); 
+  
   pinMode(button0, INPUT_PULLUP);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
@@ -217,13 +227,10 @@ void setup() {
 
 
   matrix.fillScreen(LOW);
-  miReloj.setMinutos(minute());
-  miReloj.setHora(hour());
   matrix.write();
-  //Alarm.alarmRepeat(12, 0, 0, alarma);  // Configura la alarma para las 12:00:00
 }
 
-void loop() {
+void loop() {  
 
   if (presionandoBtn(button3)) {
     modo++;
@@ -251,4 +258,5 @@ void loop() {
       matrix.write();
       break;
   }
+  EasyBuzzer.update();
 }
