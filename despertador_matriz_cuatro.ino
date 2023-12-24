@@ -96,8 +96,8 @@ Reloj miReloj;
 
 int min = 0;
 int hora = 0;
-int alarmaMin = 22;
-int alarmaHora = 15;
+int alarmaMin = 00;
+int alarmaHora = 11;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -308,10 +308,12 @@ void loop() {
 
   switch (modo) {
     case 0:
-      matrix.setIntensity(0);
+      matrix.setIntensity(brillo);
       pantallaHora();
       if(sonarAlarma() && ejecutarCada(200)){
         subirBrillo();
+      }else{
+        brillo = 0;
       }
       break;
     case 1:
