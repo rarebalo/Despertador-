@@ -119,6 +119,7 @@ char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
 bool configInicial = true;
 bool dolorDeCabeza = false;
 bool vueltaUnica = true;
+bool ultimaConfigAlarma = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -194,6 +195,7 @@ void ajustarHora() {
 void ajustarAlarma() {
   if (presionandoBtn(button4)) {
     miReloj.setSonar(!miReloj.getSonar());
+    ultimaConfigAlarma = miReloj.sonar;
   }
 
   if (presionandoBtn(button1)) {
