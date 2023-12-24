@@ -1,7 +1,7 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
-
+#include <TimeAlarms.h>
 
 // Definición de la clase Reloj
 class Reloj {
@@ -79,6 +79,8 @@ Reloj miReloj;
 
 int min = 0;
 int hora = 0;
+int alarmaMin = 0;
+int alarmaHora = 0;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -93,6 +95,7 @@ const int button3 = 6;
 const int button4 = 2;
 unsigned long tiempoInicio = millis();
 int modo = 0;
+int brillo = 0;
 
 char caracter = 'E';
 
@@ -162,6 +165,8 @@ void ajustarHora() {
   if (presionandoBtn(button2)) {
     adjustTime(-60);
   }
+  //mostrarHora();
+  //matrix.write();
 }
 
 void pantallaHora() {
@@ -173,9 +178,21 @@ void pantallaHora() {
   }
   matrix.fillScreen(LOW);
   mostrarHora();
-  matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
+  if (modo == 0) {
+    matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
+  }
+  if (modo == 1) {
+    matrix.drawChar(25, 0, 'H', HIGH, LOW, 1);
+  }
   matrix.write();
 }
+
+/*void alarma() {
+  // Este es el código que se ejecutará cuando suene la alarma
+  digitalWrite(buzzer, HIGH);  // Enciende el buzzer
+  delay(1000);                    // Espera un segundo
+  digitalWrite(buzzer, LOW);   // Apaga el buzzer
+}*/
 
 
 void setup() {
@@ -187,7 +204,7 @@ void setup() {
   pinMode(button4, INPUT_PULLUP);
   pinMode(buzzer, OUTPUT);
 
-  matrix.setIntensity(0);
+  matrix.setIntensity(brillo);
   matrix.setPosition(0, 0, 0);
   matrix.setPosition(1, 1, 0);
   matrix.setPosition(2, 2, 0);
@@ -203,31 +220,30 @@ void setup() {
   miReloj.setMinutos(minute());
   miReloj.setHora(hour());
   matrix.write();
+  //Alarm.alarmRepeat(12, 0, 0, alarma);  // Configura la alarma para las 12:00:00
 }
 
 void loop() {
 
   if (presionandoBtn(button3)) {
     modo++;
-    if (modo > 2) {
+    if (modo > 1) {
       modo = 0;
     }
   }
 
   switch (modo) {
     case 0:
+      matrix.setIntensity(0);
+      pantallaHora();
+      //Alarm.delay(1000);
+      break;
+    case 1:
+      matrix.setIntensity(3);
       ajustarHora();
       pantallaHora();
       break;
-    case 1:
-      matrix.fillScreen(LOW);
-      matrix.drawChar(4 * 6 + 2, 0, '1', HIGH, LOW, 1);
-      matrix.write();
-      break;
     case 2:
-      matrix.fillScreen(LOW);
-      matrix.drawChar(4 * 6 + 2, 0, '2', HIGH, LOW, 1);
-      matrix.write();
       break;
     default:
       matrix.fillScreen(LOW);
