@@ -69,12 +69,8 @@ public:
   }
 };
 
-const int tiempoRebote = 100;
-unsigned long lastButton1Press = 0;
-unsigned long lastButton2Press = 0;
-unsigned long lastButton3Press = 0;
-unsigned long lastButton4Press = 0;
-unsigned long lastButton5Press = 0;
+const int tiempoRebote = 200;
+unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 // Última vez que se presionó el botón 1
 // Añade más variables para más botones
 unsigned long currentMillis = millis();
@@ -90,11 +86,11 @@ const int numberOfVerticalDisplays = 1;
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 
 const int buzzer = 9;
-const int button1 = 3;
-const int button2 = 4;
-const int button3 = 5;
-const int button4 = 6;
-const int button5 = 2;
+const int button0 = 3;
+const int button1 = 4;
+const int button2 = 5;
+const int button3 = 6;
+const int button4 = 2;
 unsigned long tiempoInicio = millis();
 
 char caracter = 'E';
@@ -116,15 +112,29 @@ void mostrarHora() {
   }
 }
 
+bool presionandoBtn(int btn) {
+  if (digitalRead(btn) == LOW) {
+    currentMillis = millis();
+    if (currentMillis - ultimaPresionBtn[0] > tiempoRebote) {
+      ultimaPresionBtn[0] = currentMillis;
+      return true;
+    } else {
+      return false;
+    }
+
+  } else {
+    return false;
+  }
+}
 
 
 void setup() {
   setTime(6, 32, 0, 23, 12, 2023);
+  pinMode(button0, INPUT_PULLUP);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
   pinMode(button3, INPUT_PULLUP);
   pinMode(button4, INPUT_PULLUP);
-  pinMode(button5, INPUT_PULLUP);
   pinMode(buzzer, OUTPUT);
 
   matrix.setIntensity(0);
@@ -147,13 +157,10 @@ void setup() {
 
 void loop() {
 
-  // Comprueba si el botón 1 ha sido presionado
-  if (digitalRead(button1) == LOW) {
-    currentMillis = millis();
-    if (currentMillis - lastButton1Press > tiempoRebote) {
-      lastButton1Press = currentMillis;
-      adjustTime(3600);
-    }
+
+  if (presionandoBtn(button0)) {
+
+    adjustTime(3600);
   }
 
   if (ejecutarCada(100)) {
