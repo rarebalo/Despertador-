@@ -92,6 +92,7 @@ const int button2 = 5;
 const int button3 = 6;
 const int button4 = 2;
 unsigned long tiempoInicio = millis();
+int modo = 0;
 
 char caracter = 'E';
 
@@ -145,6 +146,37 @@ bool presionandoBtn(int btn) {
   }
 }
 
+void ajustarHora() {
+  if (presionandoBtn(button4)) {
+    adjustTime(3600);
+  }
+
+  if (presionandoBtn(button1)) {
+    adjustTime(60);
+  }
+
+  if (presionandoBtn(button0)) {
+    adjustTime(-3600);
+  }
+
+  if (presionandoBtn(button2)) {
+    adjustTime(-60);
+  }
+}
+
+void pantallaHora() {
+  if (ejecutarCada(100)) {
+    time_t tiempoActual = now();
+    miReloj.setMinutos(minute(tiempoActual));
+    miReloj.setHora(hour(tiempoActual));
+    caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
+  }
+  matrix.fillScreen(LOW);
+  mostrarHora();
+  matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
+  matrix.write();
+}
+
 
 void setup() {
   setTime(6, 32, 0, 23, 12, 2023);
@@ -175,25 +207,32 @@ void setup() {
 
 void loop() {
 
-
-  if (presionandoBtn(button0)) {
-
-    adjustTime(3600);
+  if (presionandoBtn(button3)) {
+    modo++;
+    if (modo > 2) {
+      modo = 0;
+    }
   }
 
-  if (presionandoBtn(button1)) {
-
-    adjustTime(60);
+  switch (modo) {
+    case 0:
+      ajustarHora();
+      pantallaHora();
+      break;
+    case 1:
+      matrix.fillScreen(LOW);
+      matrix.drawChar(4 * 6 + 2, 0, '1', HIGH, LOW, 1);
+      matrix.write();
+      break;
+    case 2:
+      matrix.fillScreen(LOW);
+      matrix.drawChar(4 * 6 + 2, 0, '2', HIGH, LOW, 1);
+      matrix.write();
+      break;
+    default:
+      matrix.fillScreen(LOW);
+      matrix.drawChar(4 * 6 + 2, 0, 'X', HIGH, LOW, 1);
+      matrix.write();
+      break;
   }
-
-  if (ejecutarCada(100)) {
-    time_t tiempoActual = now();
-    miReloj.setMinutos(minute(tiempoActual));
-    miReloj.setHora(hour(tiempoActual));
-    caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
-  }
-  matrix.fillScreen(LOW);
-  mostrarHora();
-  matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
-  matrix.write();
 }
