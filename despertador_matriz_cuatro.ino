@@ -1,37 +1,46 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
-#include <TimeAlarms.h>
+#include <EasyBuzzer.h>
 
-// Definición de la clase Reloj
+
+
 class Reloj {
 public:
   char horaMostrar[5];
+  char alarmaMostrar[5];
   int hora;
   int minutos;
-  int alarma;
+  int horaAlarma;
+  int minutosAlarma;
   bool sonar;
 
-  // Constructor
   Reloj() {
     hora = 0;
     minutos = 0;
-    alarma = 0;
+    horaAlarma = 0;
+    minutosAlarma = 0;
     sonar = false;
   }
 
-  // Métodos para establecer y obtener los valores
   void setDisplay() {
-    char strHora[3];
-    char strMinutos[3];
-    sprintf(strHora, "%02d", hora);
-    sprintf(strMinutos, "%02d", minutos);
-    String strHoraMostrar = String(strHora) + String(strMinutos);
-    sprintf(horaMostrar, "%s", strHoraMostrar.c_str());
+    char strHoraMostrar[5];
+    snprintf(strHoraMostrar, sizeof(strHoraMostrar), "%02d%02d", hora, minutos);
+    strncpy(horaMostrar, strHoraMostrar, sizeof(horaMostrar));
+  }
+
+  void setDisplayAlarma() {
+    char strAlarmaMostrar[5];
+    snprintf(strAlarmaMostrar, sizeof(strAlarmaMostrar), "%02d%02d", horaAlarma, minutosAlarma);
+    strncpy(alarmaMostrar, strAlarmaMostrar, sizeof(alarmaMostrar));
   }
 
   char* getDisplay() {
     return horaMostrar;
+  }
+
+  char* getDisplayAlarma() {
+    return alarmaMostrar;
   }
 
   void setHora(int h) {
@@ -43,6 +52,15 @@ public:
     return hora;
   }
 
+  void setHoraAlarma(int h) {
+    horaAlarma = h;
+    setDisplayAlarma();
+  }
+
+  int getHoraAlarma() {
+    return horaAlarma;
+  }
+
   void setMinutos(int m) {
     minutos = m;
     setDisplay();
@@ -52,12 +70,13 @@ public:
     return minutos;
   }
 
-  void setAlarma(int a) {
-    alarma = a;
+  void setMinutosAlarma(int m) {
+    minutosAlarma = m;
+    setDisplayAlarma();
   }
 
-  int getAlarma() {
-    return alarma;
+  int getMinutosAlarma() {
+    return minutosAlarma;
   }
 
   void setSonar(bool s) {
@@ -69,18 +88,16 @@ public:
   }
 };
 
-const int tiempoRebote = 200;
+const int tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
-// Última vez que se presionó el botón 1
-// Añade más variables para más botones
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
 
 int min = 0;
 int hora = 0;
-int alarmaMin = 0;
-int alarmaHora = 0;
+int alarmaMin = 00;
+int alarmaHora = 11;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -94,12 +111,15 @@ const int button2 = 5;
 const int button3 = 6;
 const int button4 = 2;
 unsigned long tiempoInicio = millis();
+unsigned long esperaEntreSonidos = 1000;
 int modo = 0;
 int brillo = 0;
-
 char caracter = 'E';
-
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
+bool configInicial = true;
+bool dolorDeCabeza = false;
+bool vueltaUnica = true;
+bool ultimaConfigAlarma = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -113,6 +133,11 @@ bool ejecutarCada(int tiempo) {
 void mostrarHora() {
   for (int i = 0; i < 4; i++) {
     matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
+  }
+}
+void mostrarAlarma() {
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, miReloj.getDisplayAlarma()[i], HIGH, LOW, 1);
   }
 }
 
@@ -165,8 +190,32 @@ void ajustarHora() {
   if (presionandoBtn(button2)) {
     adjustTime(-60);
   }
-  //mostrarHora();
-  //matrix.write();
+}
+
+void ajustarAlarma() {
+  if (presionandoBtn(button4)) {
+    miReloj.setSonar(!miReloj.getSonar());
+    ultimaConfigAlarma = miReloj.sonar;
+  }
+
+  if (presionandoBtn(button1)) {
+    if (alarmaHora < 23) {
+      alarmaHora++;
+    } else {
+      alarmaHora = 0;
+    }
+  }
+
+  if (presionandoBtn(button2)) {
+    if (alarmaMin < 59) {
+      alarmaMin++;
+    } else {
+      alarmaMin = 0;
+    }
+  }
+
+  miReloj.setHoraAlarma(alarmaHora);
+  miReloj.setMinutosAlarma(alarmaMin);
 }
 
 void pantallaHora() {
@@ -175,6 +224,9 @@ void pantallaHora() {
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
+  }
+  if (dolorDeCabeza) {
+    caracter = '*';
   }
   matrix.fillScreen(LOW);
   mostrarHora();
@@ -187,56 +239,97 @@ void pantallaHora() {
   matrix.write();
 }
 
-/*void alarma() {
-  // Este es el código que se ejecutará cuando suene la alarma
-  digitalWrite(buzzer, HIGH);  // Enciende el buzzer
-  delay(1000);                    // Espera un segundo
-  digitalWrite(buzzer, LOW);   // Apaga el buzzer
-}*/
-
-
-void setup() {
-  setTime(6, 32, 0, 23, 12, 2023);
-  pinMode(button0, INPUT_PULLUP);
-  pinMode(button1, INPUT_PULLUP);
-  pinMode(button2, INPUT_PULLUP);
-  pinMode(button3, INPUT_PULLUP);
-  pinMode(button4, INPUT_PULLUP);
-  pinMode(buzzer, OUTPUT);
-
-  matrix.setIntensity(brillo);
-  matrix.setPosition(0, 0, 0);
-  matrix.setPosition(1, 1, 0);
-  matrix.setPosition(2, 2, 0);
-  matrix.setPosition(3, 3, 0);
-
-  matrix.setRotation(0, 1);
-  matrix.setRotation(1, 1);
-  matrix.setRotation(2, 1);
-  matrix.setRotation(3, 1);
-
-
+void pantallaAlarma() {
+  if (ejecutarCada(100)) {
+    miReloj.setMinutosAlarma(alarmaMin);
+    miReloj.setHoraAlarma(alarmaHora);
+    if (miReloj.getSonar()) {
+      caracter = 'E';
+    } else {
+      caracter = 'A';
+    }
+  }
   matrix.fillScreen(LOW);
-  miReloj.setMinutos(minute());
-  miReloj.setHora(hour());
+  mostrarAlarma();
+  matrix.drawChar(25, 0, caracter, HIGH, LOW, 1);
   matrix.write();
-  //Alarm.alarmRepeat(12, 0, 0, alarma);  // Configura la alarma para las 12:00:00
+}
+
+void cambiarModo() {
+  modo++;
+  if (modo > 2) {
+    modo = 0;
+  }
+}
+
+bool estadoAlarma() {
+  return (miReloj.horaAlarma == miReloj.hora && miReloj.minutosAlarma == miReloj.minutos && miReloj.sonar);
+}
+
+void subirBrillo() {
+  brillo++;
+  if (brillo == 16) {
+    brillo = 0;
+  }
+}
+
+void buzzerBrilloActivado() {
+  subirBrillo();
+  EasyBuzzer.beep(400, 1);
+}
+
+void monitoreoAlarma() {
+  if (estadoAlarma()) {
+    dolorDeCabeza = true;
+    miReloj.setSonar(false);
+  }
+
+  if (dolorDeCabeza && presionandoBtn(button4)) {
+    dolorDeCabeza = false;
+    brillo = 0;
+  }
+
+  if (dolorDeCabeza) {
+    buzzerBrilloActivado();
+  }
+}
+void setup() {
+  if (configInicial) {
+    configInicial = false;
+    setTime(10, 59, 0, 24, 12, 2023);
+    EasyBuzzer.setPin(buzzer);
+    pinMode(button0, INPUT_PULLUP);
+    pinMode(button1, INPUT_PULLUP);
+    pinMode(button2, INPUT_PULLUP);
+    pinMode(button3, INPUT_PULLUP);
+    pinMode(button4, INPUT_PULLUP);
+    pinMode(buzzer, OUTPUT);
+    matrix.setIntensity(brillo);
+    matrix.setPosition(0, 0, 0);
+    matrix.setPosition(1, 1, 0);
+    matrix.setPosition(2, 2, 0);
+    matrix.setPosition(3, 3, 0);
+    matrix.setRotation(0, 1);
+    matrix.setRotation(1, 1);
+    matrix.setRotation(2, 1);
+    matrix.setRotation(3, 1);
+    matrix.fillScreen(LOW);
+    matrix.write();
+  }
+  EasyBuzzer.beep(400, 3);
 }
 
 void loop() {
 
   if (presionandoBtn(button3)) {
-    modo++;
-    if (modo > 1) {
-      modo = 0;
-    }
+    cambiarModo();
   }
 
   switch (modo) {
     case 0:
-      matrix.setIntensity(0);
+      matrix.setIntensity(brillo);
       pantallaHora();
-      //Alarm.delay(1000);
+      monitoreoAlarma();
       break;
     case 1:
       matrix.setIntensity(3);
@@ -244,6 +337,10 @@ void loop() {
       pantallaHora();
       break;
     case 2:
+      matrix.setIntensity(1);
+      ajustarAlarma();
+      pantallaAlarma();
+
       break;
     default:
       matrix.fillScreen(LOW);
@@ -251,4 +348,5 @@ void loop() {
       matrix.write();
       break;
   }
+  EasyBuzzer.update();
 }
