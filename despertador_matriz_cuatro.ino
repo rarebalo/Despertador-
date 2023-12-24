@@ -113,10 +113,28 @@ void mostrarHora() {
 }
 
 bool presionandoBtn(int btn) {
+  int nBtn = 0;
+  switch (btn) {
+    case button0:
+      nBtn = 0;
+      break;
+    case button1:
+      nBtn = 1;
+      break;
+    case button2:
+      nBtn = 2;
+      break;
+    case button3:
+      nBtn = 3;
+      break;
+    case button4:
+      nBtn = 4;
+      break;
+  }
   if (digitalRead(btn) == LOW) {
     currentMillis = millis();
-    if (currentMillis - ultimaPresionBtn[0] > tiempoRebote) {
-      ultimaPresionBtn[0] = currentMillis;
+    if (currentMillis - ultimaPresionBtn[nBtn] > tiempoRebote) {
+      ultimaPresionBtn[nBtn] = currentMillis;
       return true;
     } else {
       return false;
@@ -161,6 +179,11 @@ void loop() {
   if (presionandoBtn(button0)) {
 
     adjustTime(3600);
+  }
+
+  if (presionandoBtn(button1)) {
+
+    adjustTime(60);
   }
 
   if (ejecutarCada(100)) {
