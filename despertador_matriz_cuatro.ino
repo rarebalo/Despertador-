@@ -4,7 +4,7 @@
 #include <EasyBuzzer.h>
 
 
-// Definición de la clase Reloj
+
 class Reloj {
 public:
   char horaMostrar[5];
@@ -15,7 +15,6 @@ public:
   int minutosAlarma;
   bool sonar;
 
-  // Constructor
   Reloj() {
     hora = 0;
     minutos = 0;
@@ -23,8 +22,6 @@ public:
     minutosAlarma = 0;
     sonar = false;
   }
-
-  // Métodos para establecer y obtener los valores
 
   void setDisplay() {
     char strHoraMostrar[5];
@@ -99,7 +96,7 @@ Reloj miReloj;
 
 int min = 0;
 int hora = 0;
-int alarmaMin = 2;
+int alarmaMin = 22;
 int alarmaHora = 15;
 
 const int pinCS = 10;
@@ -192,6 +189,28 @@ void ajustarHora() {
   }
 }
 
+void ajustarAlarma() {
+  if (presionandoBtn(button4)) {
+    miReloj.setSonar(!miReloj.getSonar());
+  }
+
+  if (presionandoBtn(button1)) {
+   if(alarmaHora<23){
+    alarmaHora++;
+   }else{
+    alarmaHora = 0;
+   }
+  }
+
+  if (presionandoBtn(button2)) {
+    if(alarmaMin<59){
+    alarmaMin++;
+   }else{
+    alarmaMin = 0;
+   }
+  }
+}
+
 void pantallaHora() {
   if (ejecutarCada(100)) {
     time_t tiempoActual = now();
@@ -215,13 +234,14 @@ void pantallaAlarma() {
     miReloj.setMinutosAlarma(alarmaMin);
     miReloj.setHoraAlarma(alarmaHora);
     if (miReloj.getSonar()) {
-      caracter = "E";
+      caracter = 'E';
     } else {
-      caracter = "A";
+      caracter = 'A';
     }
   }
   matrix.fillScreen(LOW);
   mostrarAlarma();
+  matrix.drawChar(25, 0, caracter, HIGH, LOW, 1);
   matrix.write();
 }
 
@@ -276,6 +296,7 @@ void loop() {
       break;
     case 2:
       matrix.setIntensity(1);
+      ajustarAlarma();
       pantallaAlarma();
 
       break;
