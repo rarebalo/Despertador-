@@ -117,6 +117,7 @@ int brillo = 0;
 char caracter = 'E';
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
 bool configInicial = true;
+bool dolorDeCabeza = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -195,24 +196,23 @@ void ajustarAlarma() {
   }
 
   if (presionandoBtn(button1)) {
-   if(alarmaHora<23){
-    alarmaHora++;
-   }else{
-    alarmaHora = 0;
-   }
+    if (alarmaHora < 23) {
+      alarmaHora++;
+    } else {
+      alarmaHora = 0;
+    }
   }
 
   if (presionandoBtn(button2)) {
-    if(alarmaMin<59){
-    alarmaMin++;
-   }else{
-    alarmaMin = 0;
-   }
+    if (alarmaMin < 59) {
+      alarmaMin++;
+    } else {
+      alarmaMin = 0;
+    }
   }
-  
+
   miReloj.setHoraAlarma(alarmaHora);
   miReloj.setMinutosAlarma(alarmaMin);
-
 }
 
 void pantallaHora() {
@@ -222,8 +222,8 @@ void pantallaHora() {
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
   }
-  if(sonarAlarma()){
-   caracter = '*';
+  if (dolorDeCabeza) {
+    caracter = '*';
   }
   matrix.fillScreen(LOW);
   mostrarHora();
@@ -259,21 +259,38 @@ void cambiarModo() {
   }
 }
 
-bool sonarAlarma(){
-  if(miReloj.horaAlarma == miReloj.hora && miReloj.minutosAlarma == miReloj.minutos && miReloj.sonar){
-    return true;
-  }else{
-    return false;
-  }
+bool estadoAlarma() {
+  return (miReloj.horaAlarma == miReloj.hora && miReloj.minutosAlarma == miReloj.minutos && miReloj.sonar);
 }
 
-void subirBrillo(){
+void subirBrillo() {
   brillo++;
-  if(brillo==16){
+  if (brillo == 16) {
     brillo = 0;
   }
 }
 
+void buzzerBrilloActivado() {
+  subirBrillo();
+  EasyBuzzer.beep(400, 1);
+}
+
+void monitoreoAlarma() {
+  if (estadoAlarma()) {
+    dolorDeCabeza = true;
+  }
+
+  if(dolorDeCabeza && presionandoBtn(button4)){    
+    dolorDeCabeza = false;
+    brillo = 0;
+  }
+
+  if(dolorDeCabeza){
+    buzzerBrilloActivado();
+  }
+
+
+}
 void setup() {
   if (configInicial) {
     configInicial = false;
@@ -297,7 +314,7 @@ void setup() {
     matrix.fillScreen(LOW);
     matrix.write();
   }
-  EasyBuzzer.beep(500, 2);
+  EasyBuzzer.beep(400, 3);
 }
 
 void loop() {
@@ -310,11 +327,7 @@ void loop() {
     case 0:
       matrix.setIntensity(brillo);
       pantallaHora();
-      if(sonarAlarma() && ejecutarCada(200)){
-        subirBrillo();
-      }else{
-        brillo = 0;
-      }
+      monitoreoAlarma();
       break;
     case 1:
       matrix.setIntensity(3);
