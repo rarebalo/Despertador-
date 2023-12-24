@@ -1,7 +1,6 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
-#include <TimeAlarms.h>
 #include <EasyBuzzer.h>
 
 
@@ -99,9 +98,7 @@ int modo = 0;
 int brillo = 0;
 char caracter = 'E';
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
-
-void reproducirMelodia() {
-}
+bool configInicial = true;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -167,8 +164,6 @@ void ajustarHora() {
   if (presionandoBtn(button2)) {
     adjustTime(-60);
   }
-  //mostrarHora();
-  //matrix.write();
 }
 
 void pantallaHora() {
@@ -188,55 +183,44 @@ void pantallaHora() {
   }
   matrix.write();
 }
-
-void alarma() {
-  // Este es el código que se ejecutará cuando suene la alarma
-  EasyBuzzer.beep(
-    2000,  // Frecuencia en Hz
-    500,   // Duración del beep en milisegundos
-    1000,  // Tiempo de espera entre beeps en milisegundos
-    2,     // Cantidad de repeticiones del beep
-    1000,  // Tiempo de espera entre ciclos de beeps en milisegundos
-    1      // Cantidad de ciclos de beeps
-  );
-}
-
-void setup() {
-  EasyBuzzer.setPin(buzzer);
-  EasyBuzzer.beep(500, 2);
-  setTime(9, 20, 0, 24, 12, 2023);
-  Alarm.alarmRepeat(9, 21, 0, alarma); 
-  
-  pinMode(button0, INPUT_PULLUP);
-  pinMode(button1, INPUT_PULLUP);
-  pinMode(button2, INPUT_PULLUP);
-  pinMode(button3, INPUT_PULLUP);
-  pinMode(button4, INPUT_PULLUP);
-  pinMode(buzzer, OUTPUT);
-
-  matrix.setIntensity(brillo);
-  matrix.setPosition(0, 0, 0);
-  matrix.setPosition(1, 1, 0);
-  matrix.setPosition(2, 2, 0);
-  matrix.setPosition(3, 3, 0);
-
-  matrix.setRotation(0, 1);
-  matrix.setRotation(1, 1);
-  matrix.setRotation(2, 1);
-  matrix.setRotation(3, 1);
-
-
-  matrix.fillScreen(LOW);
-  matrix.write();
-}
-
-void loop() {  
-
-  if (presionandoBtn(button3)) {
-    modo++;
+void cambiarModo(){
+  modo++;
     if (modo > 1) {
       modo = 0;
     }
+}
+
+void setup() {
+  if (configInicial) {
+    configInicial = false;
+    setTime(10, 59, 0, 24, 12, 2023);
+    EasyBuzzer.setPin(buzzer);
+    pinMode(button0, INPUT_PULLUP);
+    pinMode(button1, INPUT_PULLUP);
+    pinMode(button2, INPUT_PULLUP);
+    pinMode(button3, INPUT_PULLUP);
+    pinMode(button4, INPUT_PULLUP);
+    pinMode(buzzer, OUTPUT);
+    matrix.setIntensity(brillo);
+    matrix.setPosition(0, 0, 0);
+    matrix.setPosition(1, 1, 0);
+    matrix.setPosition(2, 2, 0);
+    matrix.setPosition(3, 3, 0);
+    matrix.setRotation(0, 1);
+    matrix.setRotation(1, 1);
+    matrix.setRotation(2, 1);
+    matrix.setRotation(3, 1);
+    matrix.fillScreen(LOW);
+    matrix.write();
+    
+  }
+  EasyBuzzer.beep(500, 2);
+}
+
+void loop() {
+
+  if (presionandoBtn(button3)) {
+    cambiarModo();
   }
 
   switch (modo) {
