@@ -99,8 +99,8 @@ Reloj miReloj;
 
 int min = 0;
 int hora = 0;
-int alarmaMin = 0;
-int alarmaHora = 0;
+int alarmaMin = 2;
+int alarmaHora = 15;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -133,6 +133,11 @@ bool ejecutarCada(int tiempo) {
 void mostrarHora() {
   for (int i = 0; i < 4; i++) {
     matrix.drawChar(i * 6, 0, miReloj.getDisplay()[i], HIGH, LOW, 1);
+  }
+}
+void mostrarAlarma() {
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, miReloj.getDisplayAlarma()[i], HIGH, LOW, 1);
   }
 }
 
@@ -205,9 +210,24 @@ void pantallaHora() {
   matrix.write();
 }
 
+void pantallaAlarma() {
+  if (ejecutarCada(100)) {
+    miReloj.setMinutosAlarma(alarmaMin);
+    miReloj.setHoraAlarma(alarmaHora);
+    if (miReloj.getSonar()) {
+      caracter = "E";
+    } else {
+      caracter = "A";
+    }
+  }
+  matrix.fillScreen(LOW);
+  mostrarAlarma();
+  matrix.write();
+}
+
 void cambiarModo() {
   modo++;
-  if (modo > 1) {
+  if (modo > 2) {
     modo = 0;
   }
 }
@@ -255,6 +275,8 @@ void loop() {
       pantallaHora();
       break;
     case 2:
+      matrix.setIntensity(1);
+      pantallaAlarma();
 
       break;
     default:
