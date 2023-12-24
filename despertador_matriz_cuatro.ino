@@ -1,7 +1,7 @@
 #include <Adafruit_GFX.h>
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
-#define DEBOUNCE_DELAY 50 // Tiempo de rebote en milisegundos
+
 
 // Definición de la clase Reloj
 class Reloj {
@@ -69,8 +69,15 @@ public:
   }
 };
 
-unsigned long lastButton1Press = 0; // Última vez que se presionó el botón 1
+const int tiempoRebote = 100;
+unsigned long lastButton1Press = 0;
+unsigned long lastButton2Press = 0;
+unsigned long lastButton3Press = 0;
+unsigned long lastButton4Press = 0;
+unsigned long lastButton5Press = 0;
+// Última vez que se presionó el botón 1
 // Añade más variables para más botones
+unsigned long currentMillis = millis();
 
 Reloj miReloj;
 
@@ -92,7 +99,7 @@ unsigned long tiempoInicio = millis();
 
 char caracter = 'E';
 
-char diasDeLaSemana[] = {'D', 'L', 'M', 'M', 'J', 'V', 'S'}; 
+char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -111,7 +118,7 @@ void mostrarHora() {
 
 
 
-void setup() {  
+void setup() {
   setTime(6, 32, 0, 23, 12, 2023);
   pinMode(button1, INPUT_PULLUP);
   pinMode(button2, INPUT_PULLUP);
@@ -131,8 +138,8 @@ void setup() {
   matrix.setRotation(2, 1);
   matrix.setRotation(3, 1);
 
- 
-  matrix.fillScreen(LOW);  
+
+  matrix.fillScreen(LOW);
   miReloj.setMinutos(minute());
   miReloj.setHora(hour());
   matrix.write();
@@ -140,20 +147,20 @@ void setup() {
 
 void loop() {
 
-    // Comprueba si el botón 1 ha sido presionado
+  // Comprueba si el botón 1 ha sido presionado
   if (digitalRead(button1) == LOW) {
-    unsigned long currentMillis = millis();
-    if (currentMillis - lastButton1Press > DEBOUNCE_DELAY) {
+    currentMillis = millis();
+    if (currentMillis - lastButton1Press > tiempoRebote) {
       lastButton1Press = currentMillis;
-      // Aquí va el código que se ejecutará cuando se presione el botón 1
+      adjustTime(3600);
     }
   }
- 
-  if (ejecutarCada(1000)) {
-    time_t tiempoActual = now();    
+
+  if (ejecutarCada(100)) {
+    time_t tiempoActual = now();
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
-    caracter = diasDeLaSemana[weekday(tiempoActual)-1];
+    caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
   }
   matrix.fillScreen(LOW);
   mostrarHora();
