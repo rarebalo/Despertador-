@@ -8,31 +8,42 @@
 class Reloj {
 public:
   char horaMostrar[5];
+  char alarmaMostrar[5];
   int hora;
   int minutos;
-  int alarma;
+  int horaAlarma;
+  int minutosAlarma;
   bool sonar;
 
   // Constructor
   Reloj() {
     hora = 0;
     minutos = 0;
-    alarma = 0;
+    horaAlarma = 0;
+    minutosAlarma = 0;
     sonar = false;
   }
 
   // Métodos para establecer y obtener los valores
+
   void setDisplay() {
-    char strHora[3];
-    char strMinutos[3];
-    sprintf(strHora, "%02d", hora);
-    sprintf(strMinutos, "%02d", minutos);
-    String strHoraMostrar = String(strHora) + String(strMinutos);
-    sprintf(horaMostrar, "%s", strHoraMostrar.c_str());
+    char strHoraMostrar[5];
+    snprintf(strHoraMostrar, sizeof(strHoraMostrar), "%02d%02d", hora, minutos);
+    strncpy(horaMostrar, strHoraMostrar, sizeof(horaMostrar));
+  }
+
+  void setDisplayAlarma() {
+    char strAlarmaMostrar[5];
+    snprintf(strAlarmaMostrar, sizeof(strAlarmaMostrar), "%02d%02d", horaAlarma, minutosAlarma);
+    strncpy(alarmaMostrar, strAlarmaMostrar, sizeof(alarmaMostrar));
   }
 
   char* getDisplay() {
     return horaMostrar;
+  }
+
+  char* getDisplayAlarma() {
+    return alarmaMostrar;
   }
 
   void setHora(int h) {
@@ -44,6 +55,15 @@ public:
     return hora;
   }
 
+  void setHoraAlarma(int h) {
+    horaAlarma = h;
+    setDisplayAlarma();
+  }
+
+  int getHoraAlarma() {
+    return horaAlarma;
+  }
+
   void setMinutos(int m) {
     minutos = m;
     setDisplay();
@@ -53,12 +73,13 @@ public:
     return minutos;
   }
 
-  void setAlarma(int a) {
-    alarma = a;
+  void setMinutosAlarma(int m) {
+    minutosAlarma = m;
+    setDisplayAlarma();
   }
 
-  int getAlarma() {
-    return alarma;
+  int getMinutosAlarma() {
+    return minutosAlarma;
   }
 
   void setSonar(bool s) {
@@ -183,11 +204,12 @@ void pantallaHora() {
   }
   matrix.write();
 }
-void cambiarModo(){
+
+void cambiarModo() {
   modo++;
-    if (modo > 1) {
-      modo = 0;
-    }
+  if (modo > 1) {
+    modo = 0;
+  }
 }
 
 void setup() {
@@ -212,7 +234,6 @@ void setup() {
     matrix.setRotation(3, 1);
     matrix.fillScreen(LOW);
     matrix.write();
-    
   }
   EasyBuzzer.beep(500, 2);
 }
@@ -227,7 +248,6 @@ void loop() {
     case 0:
       matrix.setIntensity(0);
       pantallaHora();
-      //Alarm.delay(1000);
       break;
     case 1:
       matrix.setIntensity(3);
@@ -235,6 +255,7 @@ void loop() {
       pantallaHora();
       break;
     case 2:
+
       break;
     default:
       matrix.fillScreen(LOW);
