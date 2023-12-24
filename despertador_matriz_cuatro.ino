@@ -118,6 +118,7 @@ char caracter = 'E';
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
 bool configInicial = true;
 bool dolorDeCabeza = false;
+bool vueltaUnica = true;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -278,18 +279,17 @@ void buzzerBrilloActivado() {
 void monitoreoAlarma() {
   if (estadoAlarma()) {
     dolorDeCabeza = true;
+    miReloj.setSonar(false);
   }
 
-  if(dolorDeCabeza && presionandoBtn(button4)){    
+  if (dolorDeCabeza && presionandoBtn(button4)) {
     dolorDeCabeza = false;
     brillo = 0;
   }
 
-  if(dolorDeCabeza){
+  if (dolorDeCabeza) {
     buzzerBrilloActivado();
   }
-
-
 }
 void setup() {
   if (configInicial) {
