@@ -2,6 +2,9 @@
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
 #include <EasyBuzzer.h>
+#include <Wire.h>
+#include <RTClib.h>
+#include <EEPROM.h>
 
 
 
@@ -93,11 +96,10 @@ unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
+RTC_DS3231 rtc;
 
-int min = 0;
-int hora = 0;
-int alarmaMin = 00;
-int alarmaHora = 11;
+int alarmaMin = 0;
+int alarmaHora = 0;
 
 const int pinCS = 10;
 const int numberOfHorizontalDisplays = 4;
@@ -256,9 +258,10 @@ void pantallaAlarma() {
 }
 
 void cambiarModo() {
-  modo++;
-  if (modo > 2) {
+  if (modo > 3) {
     modo = 0;
+  }else{
+    modo++;
   }
 }
 
@@ -293,10 +296,22 @@ void monitoreoAlarma() {
     buzzerBrilloActivado();
   }
 }
+
+void guardarAlarmaEeprom() {
+  if (alarmaHora != EEPROM.read(0)) {
+    EEPROM.put(0, alarmaHora);
+  }
+  if (alarmaMin != EEPROM.read(10)) {
+    EEPROM.put(10, alarmaMin);
+  }
+  if (miReloj.sonar != EEPROM.read(20)) {
+    EEPROM.put(20, miReloj.sonar);
+  }
+}
+
 void setup() {
   if (configInicial) {
     configInicial = false;
-    setTime(10, 59, 0, 24, 12, 2023);
     EasyBuzzer.setPin(buzzer);
     pinMode(button0, INPUT_PULLUP);
     pinMode(button1, INPUT_PULLUP);
@@ -315,6 +330,16 @@ void setup() {
     matrix.setRotation(3, 1);
     matrix.fillScreen(LOW);
     matrix.write();
+    Wire.begin();
+    rtc.begin();
+    //rtc.adjust(DateTime(__DATE__, __TIME__)); //poner en hora el reloj con la pc
+    //Serial.begin(9600);
+    rtc.disable32K();  //desactiva el pin de 32k
+    DateTime now = rtc.now();
+    setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
+    alarmaHora = EEPROM.read(0);
+    alarmaMin = EEPROM.read(10);
+    miReloj.setSonar(EEPROM.read(20));
   }
   EasyBuzzer.beep(400, 3);
 }
@@ -340,9 +365,13 @@ void loop() {
       matrix.setIntensity(1);
       ajustarAlarma();
       pantallaAlarma();
-
+      break;
+    case 3:
+      guardarAlarmaEeprom();
+      modo++;
       break;
     default:
+      modo = 0;
       matrix.fillScreen(LOW);
       matrix.drawChar(4 * 6 + 2, 0, 'X', HIGH, LOW, 1);
       matrix.write();
