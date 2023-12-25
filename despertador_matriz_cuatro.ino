@@ -2,6 +2,9 @@
 #include <Max72xxPanel.h>
 #include <TimeLib.h>
 #include <EasyBuzzer.h>
+#include <Wire.h>
+#include <RTClib.h>
+#include <EEPROM.h>
 
 
 
@@ -93,6 +96,7 @@ unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
+RTC_DS3231 rtc;
 
 int min = 0;
 int hora = 0;
@@ -296,7 +300,6 @@ void monitoreoAlarma() {
 void setup() {
   if (configInicial) {
     configInicial = false;
-    setTime(10, 59, 0, 24, 12, 2023);
     EasyBuzzer.setPin(buzzer);
     pinMode(button0, INPUT_PULLUP);
     pinMode(button1, INPUT_PULLUP);
@@ -315,6 +318,13 @@ void setup() {
     matrix.setRotation(3, 1);
     matrix.fillScreen(LOW);
     matrix.write();
+    Wire.begin();
+    rtc.begin();
+    //rtc.adjust(DateTime(__DATE__, __TIME__)); //poner en hora el reloj con la pc
+    //Serial.begin(9600);
+    rtc.disable32K();  //desactiva el pin de 32k
+    DateTime now = rtc.now();
+    setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
   }
   EasyBuzzer.beep(400, 3);
 }
