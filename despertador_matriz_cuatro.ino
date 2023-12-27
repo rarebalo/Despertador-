@@ -279,6 +279,9 @@ void pantallaAlarma() {
   matrix.fillScreen(LOW);
   mostrarAlarma();
   matrix.drawChar(25, 0, caracter, HIGH, LOW, 1);
+  matrix.drawPixel(24, 7, HIGH);
+  matrix.drawPixel(30, 7, HIGH);
+  matrix.drawPixel(8, 7, HIGH);
   matrix.write();
 }
 
@@ -407,6 +410,7 @@ void loop() {
       monitoreoAlarma();
       break;
     case 1:
+      //no anda ajustar hora
       matrix.setIntensity(3);
       ajustarHora();
       pantallaHora();
