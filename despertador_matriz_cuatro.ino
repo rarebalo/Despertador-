@@ -239,6 +239,12 @@ void pantallaHora() {
   if (modo == 1) {
     matrix.drawChar(25, 0, 'H', HIGH, LOW, 1);
   }
+
+  if (miReloj.sonar) {
+    matrix.drawPixel(matrix.width() - 1, matrix.height() - 1, HIGH);
+  } else {
+    matrix.drawPixel(matrix.width() - 1, matrix.height() - 1, LOW);
+  }
   matrix.write();
 }
 
@@ -319,17 +325,25 @@ void actualizarHora() {
 }*/
 
 void mostrarTemperatura() {
-  char stringAMostrar[5];
-  char srtAMostrar[5];
-  snprintf(srtAMostrar, sizeof(srtAMostrar), "%02d%02d", 'T', rtc.getTemperature());
+  float temperaturaFloat = rtc.getTemperature();               // Obtener la temperatura como float
+  int temperaturaEntera = static_cast<int>(temperaturaFloat);  // Convertir el float a entero
+
+  // Calcular la parte decimal multiplicando por 100 y restando la parte entera
+  int temperaturaDecimal = static_cast<int>((temperaturaFloat - temperaturaEntera) * 100);
+
+  char stringAMostrar[6];
+  char srtAMostrar[6];
+
+  snprintf(srtAMostrar, sizeof(srtAMostrar), "%02d%02d", temperaturaEntera, temperaturaDecimal);
   strncpy(stringAMostrar, srtAMostrar, sizeof(stringAMostrar));
-   matrix.fillScreen(LOW);
-  for (int i = 0; i < 4; i++) {
+
+  matrix.fillScreen(LOW);
+  for (int i = 0; i < 5; i++) {
     matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
   }
+  matrix.drawChar(4 * 6 + 2, 0, 'T', HIGH, LOW, 1);
   matrix.write();
 }
-
 
 void setup() {
   if (configInicial) {
@@ -393,7 +407,7 @@ void loop() {
       modo++;
       break;
     case 4:
-      mostrarTemperatura();      
+      mostrarTemperatura();
       break;
     default:
       modo = 0;
