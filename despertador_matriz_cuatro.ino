@@ -241,9 +241,9 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    matrix.drawPixel(matrix.width() - 1, matrix.height() - 1, HIGH);
+    matrix.drawPixel(24, 3, HIGH);
   } else {
-    matrix.drawPixel(matrix.width() - 1, matrix.height() - 1, LOW);
+    matrix.drawPixel(24, 3, LOW);
   }
   matrix.write();
 }
