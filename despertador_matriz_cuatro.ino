@@ -122,6 +122,8 @@ bool configInicial = true;
 bool dolorDeCabeza = false;
 bool vueltaUnica = true;
 bool ultimaConfigAlarma = false;
+bool visualizacionSegundos = false;
+int contadorSegundos = 0;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -227,12 +229,21 @@ void pantallaHora() {
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
+    if (contadorSegundos < 11) {
+      contadorSegundos++;
+    } else {
+      contadorSegundos = 0;
+      visualizacionSegundos = !visualizacionSegundos;
+    }
   }
+
   if (dolorDeCabeza) {
     caracter = '*';
   }
+
   matrix.fillScreen(LOW);
   mostrarHora();
+
   if (modo == 0) {
     matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
   }
@@ -241,10 +252,17 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    matrix.drawPixel(24, 3, HIGH);
+    matrix.drawPixel(24, 1, HIGH);
   } else {
-    matrix.drawPixel(24, 3, LOW);
+    matrix.drawPixel(24, 1, LOW);
   }
+
+  if (visualizacionSegundos) {
+    matrix.drawPixel(24, 6, HIGH);
+  } else {
+    matrix.drawPixel(24, 6, LOW);
+  }
+
   matrix.write();
 }
 
@@ -319,10 +337,6 @@ void actualizarHora() {
   DateTime now = rtc.now();
   setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
 }
-
-/*void mostrarTemperatura() {
-  rtc.getTemperature();
-}*/
 
 void mostrarTemperatura() {
   float temperaturaFloat = rtc.getTemperature();               // Obtener la temperatura como float
