@@ -222,6 +222,7 @@ void ajustarAlarma() {
 
 void pantallaHora() {
   if (ejecutarCada(100)) {
+    actualizarHora();
     time_t tiempoActual = now();
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
@@ -307,6 +308,10 @@ void guardarAlarmaEeprom() {
   if (miReloj.sonar != EEPROM.read(20)) {
     EEPROM.put(20, miReloj.sonar);
   }
+}
+void actualizarHora(){
+  DateTime now = rtc.now(); 
+  setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
 }
 
 void setup() {
