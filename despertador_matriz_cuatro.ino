@@ -122,6 +122,8 @@ bool configInicial = true;
 bool dolorDeCabeza = false;
 bool vueltaUnica = true;
 bool ultimaConfigAlarma = false;
+bool visualizacionSegundos = false;
+int contadorSegundos = 0;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -222,22 +224,45 @@ void ajustarAlarma() {
 
 void pantallaHora() {
   if (ejecutarCada(100)) {
+    actualizarHora();
     time_t tiempoActual = now();
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
+    if (contadorSegundos < 11) {
+      contadorSegundos++;
+    } else {
+      contadorSegundos = 0;
+      visualizacionSegundos = !visualizacionSegundos;
+    }
   }
+
   if (dolorDeCabeza) {
     caracter = '*';
   }
+
   matrix.fillScreen(LOW);
   mostrarHora();
+
   if (modo == 0) {
     matrix.drawChar(4 * 6 + 2, 0, caracter, HIGH, LOW, 1);
   }
   if (modo == 1) {
     matrix.drawChar(25, 0, 'H', HIGH, LOW, 1);
   }
+
+  if (miReloj.sonar) {
+    matrix.drawPixel(24, 1, HIGH);
+  } else {
+    matrix.drawPixel(24, 1, LOW);
+  }
+
+  if (visualizacionSegundos) {
+    matrix.drawPixel(24, 6, HIGH);
+  } else {
+    matrix.drawPixel(24, 6, LOW);
+  }
+
   matrix.write();
 }
 
@@ -254,13 +279,16 @@ void pantallaAlarma() {
   matrix.fillScreen(LOW);
   mostrarAlarma();
   matrix.drawChar(25, 0, caracter, HIGH, LOW, 1);
+  matrix.drawPixel(24, 7, HIGH);
+  matrix.drawPixel(30, 7, HIGH);
+  matrix.drawPixel(8, 7, HIGH);
   matrix.write();
 }
 
 void cambiarModo() {
-  if (modo > 3) {
+  if (modo > 4) {
     modo = 0;
-  }else{
+  } else {
     modo++;
   }
 }
@@ -307,6 +335,31 @@ void guardarAlarmaEeprom() {
   if (miReloj.sonar != EEPROM.read(20)) {
     EEPROM.put(20, miReloj.sonar);
   }
+}
+void actualizarHora() {
+  DateTime now = rtc.now();
+  setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
+}
+
+void mostrarTemperatura() {
+  float temperaturaFloat = rtc.getTemperature();               // Obtener la temperatura como float
+  int temperaturaEntera = static_cast<int>(temperaturaFloat);  // Convertir el float a entero
+
+  // Calcular la parte decimal multiplicando por 100 y restando la parte entera
+  int temperaturaDecimal = static_cast<int>((temperaturaFloat - temperaturaEntera) * 100);
+
+  char stringAMostrar[6];
+  char srtAMostrar[6];
+
+  snprintf(srtAMostrar, sizeof(srtAMostrar), "%02d%02d", temperaturaEntera, temperaturaDecimal);
+  strncpy(stringAMostrar, srtAMostrar, sizeof(stringAMostrar));
+
+  matrix.fillScreen(LOW);
+  for (int i = 0; i < 5; i++) {
+    matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
+  }
+  matrix.drawChar(4 * 6 + 2, 0, 'T', HIGH, LOW, 1);
+  matrix.write();
 }
 
 void setup() {
@@ -357,6 +410,7 @@ void loop() {
       monitoreoAlarma();
       break;
     case 1:
+      //no anda ajustar hora
       matrix.setIntensity(3);
       ajustarHora();
       pantallaHora();
@@ -369,6 +423,9 @@ void loop() {
     case 3:
       guardarAlarmaEeprom();
       modo++;
+      break;
+    case 4:
+      mostrarTemperatura();
       break;
     default:
       modo = 0;
