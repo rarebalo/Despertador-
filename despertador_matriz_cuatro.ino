@@ -259,9 +259,9 @@ void pantallaAlarma() {
 }
 
 void cambiarModo() {
-  if (modo > 3) {
+  if (modo > 4) {
     modo = 0;
-  }else{
+  } else {
     modo++;
   }
 }
@@ -309,10 +309,27 @@ void guardarAlarmaEeprom() {
     EEPROM.put(20, miReloj.sonar);
   }
 }
-void actualizarHora(){
-  DateTime now = rtc.now(); 
+void actualizarHora() {
+  DateTime now = rtc.now();
   setTime(now.hour(), now.minute(), now.second(), now.day(), now.month(), now.year());
 }
+
+/*void mostrarTemperatura() {
+  rtc.getTemperature();
+}*/
+
+void mostrarTemperatura() {
+  char stringAMostrar[5];
+  char srtAMostrar[5];
+  snprintf(srtAMostrar, sizeof(srtAMostrar), "%02d%02d", 'T', rtc.getTemperature());
+  strncpy(stringAMostrar, srtAMostrar, sizeof(stringAMostrar));
+   matrix.fillScreen(LOW);
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
+  }
+  matrix.write();
+}
+
 
 void setup() {
   if (configInicial) {
@@ -374,6 +391,9 @@ void loop() {
     case 3:
       guardarAlarmaEeprom();
       modo++;
+      break;
+    case 4:
+      mostrarTemperatura();      
       break;
     default:
       modo = 0;
