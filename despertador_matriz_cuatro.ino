@@ -325,6 +325,10 @@ void monitoreoAlarma() {
   if (dolorDeCabeza) {
     buzzerBrilloActivado();
   }
+
+  if(miReloj.minutosAlarma != miReloj.minutos){
+    miReloj.setSonar(EEPROM.read(20));
+  }
 }
 
 void guardarAlarmaEeprom() {
