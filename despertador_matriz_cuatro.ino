@@ -286,7 +286,7 @@ void pantallaAlarma() {
 }
 
 void cambiarModo() {
-  if (modo > 4) {
+  if (modo > 5) {
     modo = 0;
   } else {
     modo++;
@@ -360,11 +360,34 @@ void mostrarTemperatura() {
     matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
   }
   matrix.drawPixel(10, 6, HIGH);
-  matrix.drawChar(4 * 6 + 2, 0, 'T', HIGH, LOW, 1);
+  matrix.drawChar(4 * 6 + 2, 0, 'C', HIGH, LOW, 1);
   matrix.write();
 }
-void finDeSonido(){
+void finDeSonido() {
   EasyBuzzer.beep(500, 3);
+}
+
+void modificarBrillo() {
+
+  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
+  if (presionandoBtn(button4)) {
+    brillo++;
+    matrix.fillScreen(LOW);
+
+    for (int i = 0; i < brillo * 2; i++) {
+      for (int o = 0; o < 8; o++) {
+        matrix.drawPixel(i, o, HIGH);
+      }
+    }
+    matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
+    matrix.write();
+    if (brillo == 10) {
+      brillo = 0;
+      matrix.fillScreen(LOW);
+      matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
+      matrix.write();
+    }
+  }
 }
 
 void setup() {
@@ -399,11 +422,11 @@ void setup() {
     alarmaMin = EEPROM.read(10);
     miReloj.setSonar(EEPROM.read(20));
   }
-  if(millis()-esperaEntreSonidos > 3000){
+  if (millis() - esperaEntreSonidos > 3000) {
     esperaEntreSonidos = millis();
-    EasyBuzzer.beep(1500, 200, 50, 3, 500, 1,finDeSonido);
+    EasyBuzzer.beep(1500, 200, 50, 3, 500, 1, finDeSonido);
     //EasyBuzzer.beep(1500, 3);
-  }  
+  }
 }
 
 void loop() {
@@ -436,6 +459,9 @@ void loop() {
     case 4:
       mostrarTemperatura();
       break;
+    case 5:
+      modificarBrillo();
+      break;
     default:
       modo = 0;
       matrix.fillScreen(LOW);
@@ -444,4 +470,4 @@ void loop() {
       break;
   }
   EasyBuzzer.update();
-} 
+}
