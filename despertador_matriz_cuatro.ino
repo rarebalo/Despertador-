@@ -362,6 +362,9 @@ void mostrarTemperatura() {
   matrix.drawChar(4 * 6 + 2, 0, 'T', HIGH, LOW, 1);
   matrix.write();
 }
+void finDeSonido(){
+  EasyBuzzer.beep(500, 3);
+}
 
 void setup() {
   if (configInicial) {
@@ -395,9 +398,10 @@ void setup() {
     alarmaMin = EEPROM.read(10);
     miReloj.setSonar(EEPROM.read(20));
   }
-  if(millis()-esperaEntreSonidos > 400){
+  if(millis()-esperaEntreSonidos > 3000){
     esperaEntreSonidos = millis();
-    EasyBuzzer.beep(1500, 3);
+    EasyBuzzer.beep(1500, 200, 50, 3, 500, 1,finDeSonido);
+    //EasyBuzzer.beep(1500, 3);
   }  
 }
 
