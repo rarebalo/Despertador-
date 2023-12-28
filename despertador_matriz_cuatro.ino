@@ -381,17 +381,21 @@ void modificarBrillo() {
     }
     entraPrimeraVez = false;
     matrix.fillScreen(LOW);
+    matrix.setIntensity(brillo);
 
     for (int i = 0; i < brillo * 2; i++) {
       for (int o = 0; o < 8; o++) {
         matrix.drawPixel(i, o, HIGH);
       }
     }
+    matrix.drawPixel(8, 7, HIGH);
     matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
     matrix.write();
     if (brillo == 10) {
       brillo = 0;
       matrix.fillScreen(LOW);
+      matrix.setIntensity(brillo);
+      matrix.drawPixel(8, 7, HIGH);
       matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
       matrix.write();
     }
