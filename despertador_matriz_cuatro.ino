@@ -359,6 +359,7 @@ void mostrarTemperatura() {
   for (int i = 0; i < 5; i++) {
     matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
   }
+  matrix.drawPixel(10, 6, HIGH);
   matrix.drawChar(4 * 6 + 2, 0, 'T', HIGH, LOW, 1);
   matrix.write();
 }
