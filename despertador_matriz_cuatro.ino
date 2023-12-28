@@ -264,6 +264,10 @@ void pantallaHora() {
     matrix.drawPixel(24, 6, LOW);
   }
 
+  if(dolorDeCabeza){
+    matrix.drawPixel(8, 7, HIGH);
+  }
+
   matrix.write();
 }
 
@@ -308,7 +312,6 @@ void subirBrillo() {
 void buzzerBrilloActivado() {
   subirBrillo();
   setup();
-  //EasyBuzzer.beep(400, 1);
 }
 
 void monitoreoAlarma() {
@@ -322,7 +325,7 @@ void monitoreoAlarma() {
     brillo = 0;
   }
 
-  if (dolorDeCabeza) {
+  if (dolorDeCabeza) {    
     buzzerBrilloActivado();
   }
 
