@@ -306,7 +306,8 @@ void subirBrillo() {
 
 void buzzerBrilloActivado() {
   subirBrillo();
-  EasyBuzzer.beep(400, 1);
+  setup();
+  //EasyBuzzer.beep(400, 1);
 }
 
 void monitoreoAlarma() {
@@ -394,7 +395,10 @@ void setup() {
     alarmaMin = EEPROM.read(10);
     miReloj.setSonar(EEPROM.read(20));
   }
-  EasyBuzzer.beep(400, 3);
+  if(millis()-esperaEntreSonidos > 400){
+    esperaEntreSonidos = millis();
+    EasyBuzzer.beep(1500, 3);
+  }  
 }
 
 void loop() {
@@ -435,4 +439,4 @@ void loop() {
       break;
   }
   EasyBuzzer.update();
-}
+} 
