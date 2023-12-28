@@ -124,6 +124,7 @@ bool vueltaUnica = true;
 bool ultimaConfigAlarma = false;
 bool visualizacionSegundos = false;
 int contadorSegundos = 0;
+bool entraPrimeraVez = true;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -370,8 +371,11 @@ void finDeSonido() {
 void modificarBrillo() {
 
   char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
-  if (presionandoBtn(button4)) {
-    brillo++;
+  if (presionandoBtn(button4) || entraPrimeraVez) {
+    if(!entraPrimeraVez){
+       brillo++;
+    }
+    entraPrimeraVez = false;
     matrix.fillScreen(LOW);
 
     for (int i = 0; i < brillo * 2; i++) {
@@ -389,6 +393,13 @@ void modificarBrillo() {
     }
   }
 }
+
+void limpiarPantalla() {
+  matrix.fillScreen(LOW);
+  matrix.write();
+  entraPrimeraVez = true;
+}
+
 
 void setup() {
   if (configInicial) {
@@ -433,6 +444,7 @@ void loop() {
 
   if (presionandoBtn(button3)) {
     cambiarModo();
+    limpiarPantalla();
   }
 
   switch (modo) {
