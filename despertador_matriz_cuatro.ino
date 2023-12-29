@@ -258,28 +258,9 @@ void pantallaHora() {
   if (miReloj.sonar) {
     pantallaDeError();
   }
+
+  pilotoDelSegundo();
   
-  if (visualizacionSegundos != visualizacionSegundosAnterior) { 
-    visualizacionSegundosAnterior = visualizacionSegundos;       
-
-    if (visualizacionSegundos) {
-      matrix.drawPixel(24, caminoSegundo, LOW);  
-
-      if (incrementando) {
-        caminoSegundo++;  
-      } else {
-        caminoSegundo--;  
-      }
-
-      if (caminoSegundo == 2 || caminoSegundo == 5) {
-        incrementando = !incrementando; 
-      }
-
-      matrix.drawPixel(24, caminoSegundo, HIGH); 
-    }
-  }
-  matrix.drawPixel(24, caminoSegundo, HIGH);
-
   if (dolorDeCabeza) {
     matrix.drawPixel(8, 7, HIGH);
   }
@@ -435,6 +416,29 @@ void pantallaDeError() {
   }
   matrix.write();
 }
+
+void pilotoDelSegundo(){
+    if (visualizacionSegundos != visualizacionSegundosAnterior) { 
+    visualizacionSegundosAnterior = visualizacionSegundos;       
+
+    if (visualizacionSegundos) {
+      matrix.drawPixel(24, caminoSegundo, LOW);  
+
+      if (incrementando) {
+        caminoSegundo++;  
+      } else {
+        caminoSegundo--;  
+      }
+
+      if (caminoSegundo == 2 || caminoSegundo == 5) {
+        incrementando = !incrementando; 
+      }
+
+      matrix.drawPixel(24, caminoSegundo, HIGH); 
+    }
+  }
+  matrix.drawPixel(24, caminoSegundo, HIGH);
+  }
 
 
 void setup() {
