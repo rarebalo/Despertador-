@@ -256,7 +256,7 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    pantallaDeError();
+    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);    
   }
 
   pilotoDelSegundo();
@@ -409,7 +409,7 @@ void limpiarPantalla() {
 }
 
 void pantallaDeError() {
-  if (random(0, 2) == 1) {
+  if (random(2) == 1) {
     matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
   } else {
     matrix.drawPixel(random(0, 32), random(0, 8), LOW);
