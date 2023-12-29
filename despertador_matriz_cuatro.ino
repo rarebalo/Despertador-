@@ -12,10 +12,10 @@ class Reloj {
 public:
   char horaMostrar[5];
   char alarmaMostrar[5];
-  int hora;
-  int minutos;
-  int horaAlarma;
-  int minutosAlarma;
+  byte hora;
+  byte minutos;
+  byte horaAlarma;
+  byte minutosAlarma;
   bool sonar;
 
   Reloj() {
@@ -46,39 +46,39 @@ public:
     return alarmaMostrar;
   }
 
-  void setHora(int h) {
+  void setHora(byte h) {
     hora = h;
     setDisplay();
   }
 
-  int getHora() {
+  byte getHora() {
     return hora;
   }
 
-  void setHoraAlarma(int h) {
+  void setHoraAlarma(byte h) {
     horaAlarma = h;
     setDisplayAlarma();
   }
 
-  int getHoraAlarma() {
+  byte getHoraAlarma() {
     return horaAlarma;
   }
 
-  void setMinutos(int m) {
+  void setMinutos(byte m) {
     minutos = m;
     setDisplay();
   }
 
-  int getMinutos() {
+  byte getMinutos() {
     return minutos;
   }
 
-  void setMinutosAlarma(int m) {
+  void setMinutosAlarma(byte m) {
     minutosAlarma = m;
     setDisplayAlarma();
   }
 
-  int getMinutosAlarma() {
+  byte getMinutosAlarma() {
     return minutosAlarma;
   }
 
@@ -91,31 +91,31 @@ public:
   }
 };
 
-const int tiempoRebote = 180;
+const byte tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
 RTC_DS3231 rtc;
 
-int alarmaMin = 0;
-int alarmaHora = 0;
+byte alarmaMin = 0;
+byte alarmaHora = 0;
 
-const int pinCS = 10;
-const int numberOfHorizontalDisplays = 4;
-const int numberOfVerticalDisplays = 1;
+const byte pinCS = 10;
+const byte numberOfHorizontalDisplays = 4;
+const byte numberOfVerticalDisplays = 1;
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 
-const int buzzer = 9;
-const int button0 = 3;
-const int button1 = 4;
-const int button2 = 5;
-const int button3 = 6;
-const int button4 = 2;
+const byte buzzer = 9;
+const byte button0 = 3;
+const byte button1 = 4;
+const byte button2 = 5;
+const byte button3 = 6;
+const byte button4 = 2;
 unsigned long tiempoInicio = millis();
 unsigned long esperaEntreSonidos = 1000;
-int modo = 0;
-int brillo = 0;
+byte modo = 0;
+byte brillo = 0;
 char caracter = 'E';
 char diasDeLaSemana[] = { 'D', 'L', 'M', 'M', 'J', 'V', 'S' };
 bool configInicial = true;
@@ -123,11 +123,24 @@ bool dolorDeCabeza = false;
 bool vueltaUnica = true;
 bool ultimaConfigAlarma = false;
 bool visualizacionSegundos = false;
-int contadorSegundos = 0;
+byte contadorSegundos = 0;
 bool entraPrimeraVez = true;
-int caminoSegundo = 3;
+byte caminoSegundo = 3;
 bool incrementando = true;
 bool visualizacionSegundosAnterior = false;
+int horaAjus;
+int minAjus;
+int segAjus;
+int anioAjus;
+int mesAjus;
+int diaAjus;
+bool cargarVariablesAjusHora = true;
+bool configHoraManual = false;
+int filaAjus;
+int columnaAjus;
+int trianguloUno,trianguloDos,trianguloTres;
+int trianguloUnoY,trianguloDosY,trianguloTresY;
+unsigned long tiempoTriangulo = millis();
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -147,6 +160,19 @@ void mostrarAlarma() {
   for (int i = 0; i < 4; i++) {
     matrix.drawChar(i * 6, 0, miReloj.getDisplayAlarma()[i], HIGH, LOW, 1);
   }
+}
+void mostrarAjusHora() {
+  char strajusHoraMostrar[5];
+  char ajusHoraMostrar[5];
+  snprintf(strajusHoraMostrar, sizeof(strajusHoraMostrar), "%02d%02d", horaAjus, minAjus);
+  strncpy(ajusHoraMostrar, strajusHoraMostrar, sizeof(ajusHoraMostrar));
+  matrix.fillScreen(LOW);
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, ajusHoraMostrar[i], HIGH, LOW, 1);
+  }
+  formasDelTriangulo();
+  matrix.drawTriangle(trianguloUno, trianguloUnoY, trianguloDos, trianguloDosY, trianguloTres, trianguloTresY, HIGH);
+  matrix.write();
 }
 
 bool presionandoBtn(int btn) {
@@ -183,20 +209,60 @@ bool presionandoBtn(int btn) {
 }
 
 void ajustarHora() {
+
+  cargarVarAjusHora();
   if (presionandoBtn(button4)) {
-    adjustTime(3600);
+    horaAjus++;
+    if (horaAjus > 23) {
+      horaAjus = 0;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button1)) {
-    adjustTime(60);
+    minAjus++;
+    if (minAjus > 59) {
+      minAjus = 0;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button0)) {
-    adjustTime(-3600);
+    horaAjus--;
+    if (horaAjus < 0) {
+      horaAjus = 23;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button2)) {
-    adjustTime(-60);
+    minAjus--;
+    if (minAjus < 0) {
+      minAjus = 59;
+    }
+    configHoraManual = true;
+  }
+  mostrarAjusHora();
+}
+
+void actualizarHoraManual() {
+  if (configHoraManual) {
+    configHoraManual = false;
+    rtc.adjust(DateTime(anioAjus, mesAjus, diaAjus, horaAjus, minAjus, segAjus));
+  }
+  cargarVariablesAjusHora = true;
+}
+
+void cargarVarAjusHora() {
+  if (cargarVariablesAjusHora) {
+    cargarVariablesAjusHora = false;
+    time_t tiempoActual = now();
+    anioAjus = year(tiempoActual);
+    mesAjus = month(tiempoActual);
+    diaAjus = weekday(tiempoActual);
+    horaAjus = hour(tiempoActual);
+    minAjus = minute(tiempoActual);
+    segAjus = second(tiempoActual);
   }
 }
 
@@ -256,11 +322,11 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    pantallaDeError();
+    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
   }
 
   pilotoDelSegundo();
-  
+
   if (dolorDeCabeza) {
     matrix.drawPixel(8, 7, HIGH);
   }
@@ -348,10 +414,9 @@ void actualizarHora() {
 }
 
 void mostrarTemperatura() {
-  float temperaturaFloat = rtc.getTemperature();               // Obtener la temperatura como float
-  int temperaturaEntera = static_cast<int>(temperaturaFloat);  // Convertir el float a entero
+  float temperaturaFloat = rtc.getTemperature();
+  int temperaturaEntera = static_cast<int>(temperaturaFloat);
 
-  // Calcular la parte decimal multiplicando por 100 y restando la parte entera
   int temperaturaDecimal = static_cast<int>((temperaturaFloat - temperaturaEntera) * 100);
 
   char stringAMostrar[6];
@@ -374,7 +439,7 @@ void finDeSonido() {
 
 void modificarBrillo() {
 
-  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
+  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
     if (!entraPrimeraVez) {
       brillo++;
@@ -409,7 +474,7 @@ void limpiarPantalla() {
 }
 
 void pantallaDeError() {
-  if (random(0, 2) == 1) {
+  if (random(2) == 1) {
     matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
   } else {
     matrix.drawPixel(random(0, 32), random(0, 8), LOW);
@@ -417,28 +482,40 @@ void pantallaDeError() {
   matrix.write();
 }
 
-void pilotoDelSegundo(){
-    if (visualizacionSegundos != visualizacionSegundosAnterior) { 
-    visualizacionSegundosAnterior = visualizacionSegundos;       
+void pilotoDelSegundo() {
+  if (visualizacionSegundos != visualizacionSegundosAnterior) {
+    visualizacionSegundosAnterior = visualizacionSegundos;
 
     if (visualizacionSegundos) {
-      matrix.drawPixel(24, caminoSegundo, LOW);  
+      matrix.drawPixel(24, caminoSegundo, LOW);
 
       if (incrementando) {
-        caminoSegundo++;  
+        caminoSegundo++;
       } else {
-        caminoSegundo--;  
+        caminoSegundo--;
       }
 
       if (caminoSegundo == 2 || caminoSegundo == 5) {
-        incrementando = !incrementando; 
+        incrementando = !incrementando;
       }
 
-      matrix.drawPixel(24, caminoSegundo, HIGH); 
+      matrix.drawPixel(24, caminoSegundo, HIGH);
     }
   }
   matrix.drawPixel(24, caminoSegundo, HIGH);
+}
+
+void formasDelTriangulo(){
+  if(millis() - tiempoTriangulo > 500){
+    tiempoTriangulo = millis();
+    trianguloUno = random(23,32);
+    trianguloDos = random(23,32);
+    trianguloTres = random(23,32);
+    trianguloUnoY = random(0,8);
+    trianguloDosY = random(0,8);
+    trianguloTresY = random(0,8);
   }
+}
 
 
 void setup() {
@@ -491,16 +568,12 @@ void loop() {
       matrix.setIntensity(brillo);
       pantallaHora();
       monitoreoAlarma();
-      //pantallaDeError();
       break;
     case 1:
-      //no anda ajustar hora
-      /*matrix.setIntensity(3);
       ajustarHora();
-      pantallaHora();*/
-      pantallaDeError();
       break;
     case 2:
+      actualizarHoraManual();
       matrix.setIntensity(1);
       ajustarAlarma();
       pantallaAlarma();
