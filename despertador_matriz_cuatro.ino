@@ -125,6 +125,9 @@ bool ultimaConfigAlarma = false;
 bool visualizacionSegundos = false;
 int contadorSegundos = 0;
 bool entraPrimeraVez = true;
+int caminoSegundo = 3;
+bool incrementando = true;
+bool visualizacionSegundosAnterior = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -230,7 +233,7 @@ void pantallaHora() {
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
-    if (contadorSegundos < 11) {
+    if (contadorSegundos < 1) {
       contadorSegundos++;
     } else {
       contadorSegundos = 0;
@@ -253,15 +256,13 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    matrix.drawPixel(24, 1, HIGH);
-  } else {
-    matrix.drawPixel(24, 1, LOW);
+    pantallaDeError();
   }
 
-  if (visualizacionSegundos) {
-    matrix.drawPixel(24, 6, HIGH);
-  } else {
-    matrix.drawPixel(24, 6, LOW);
+  pilotoDelSegundo();
+  
+  if (dolorDeCabeza) {
+    matrix.drawPixel(8, 7, HIGH);
   }
 
   matrix.write();
@@ -308,7 +309,6 @@ void subirBrillo() {
 void buzzerBrilloActivado() {
   subirBrillo();
   setup();
-  //EasyBuzzer.beep(400, 1);
 }
 
 void monitoreoAlarma() {
@@ -326,7 +326,7 @@ void monitoreoAlarma() {
     buzzerBrilloActivado();
   }
 
-  if(miReloj.minutosAlarma != miReloj.minutos){
+  if (miReloj.minutosAlarma != miReloj.minutos) {
     miReloj.setSonar(EEPROM.read(20));
   }
 }
@@ -376,22 +376,26 @@ void modificarBrillo() {
 
   char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
-    if(!entraPrimeraVez){
-       brillo++;
+    if (!entraPrimeraVez) {
+      brillo++;
     }
     entraPrimeraVez = false;
     matrix.fillScreen(LOW);
+    matrix.setIntensity(brillo);
 
     for (int i = 0; i < brillo * 2; i++) {
       for (int o = 0; o < 8; o++) {
         matrix.drawPixel(i, o, HIGH);
       }
     }
+    matrix.drawPixel(8, 7, HIGH);
     matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
     matrix.write();
     if (brillo == 10) {
       brillo = 0;
       matrix.fillScreen(LOW);
+      matrix.setIntensity(brillo);
+      matrix.drawPixel(8, 7, HIGH);
       matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
       matrix.write();
     }
@@ -403,6 +407,38 @@ void limpiarPantalla() {
   matrix.write();
   entraPrimeraVez = true;
 }
+
+void pantallaDeError() {
+  if (random(0, 2) == 1) {
+    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
+  } else {
+    matrix.drawPixel(random(0, 32), random(0, 8), LOW);
+  }
+  matrix.write();
+}
+
+void pilotoDelSegundo(){
+    if (visualizacionSegundos != visualizacionSegundosAnterior) { 
+    visualizacionSegundosAnterior = visualizacionSegundos;       
+
+    if (visualizacionSegundos) {
+      matrix.drawPixel(24, caminoSegundo, LOW);  
+
+      if (incrementando) {
+        caminoSegundo++;  
+      } else {
+        caminoSegundo--;  
+      }
+
+      if (caminoSegundo == 2 || caminoSegundo == 5) {
+        incrementando = !incrementando; 
+      }
+
+      matrix.drawPixel(24, caminoSegundo, HIGH); 
+    }
+  }
+  matrix.drawPixel(24, caminoSegundo, HIGH);
+  }
 
 
 void setup() {
@@ -440,7 +476,6 @@ void setup() {
   if (millis() - esperaEntreSonidos > 3000) {
     esperaEntreSonidos = millis();
     EasyBuzzer.beep(1500, 200, 50, 3, 500, 1, finDeSonido);
-    //EasyBuzzer.beep(1500, 3);
   }
 }
 
@@ -456,12 +491,14 @@ void loop() {
       matrix.setIntensity(brillo);
       pantallaHora();
       monitoreoAlarma();
+      //pantallaDeError();
       break;
     case 1:
       //no anda ajustar hora
-      matrix.setIntensity(3);
+      /*matrix.setIntensity(3);
       ajustarHora();
-      pantallaHora();
+      pantallaHora();*/
+      pantallaDeError();
       break;
     case 2:
       matrix.setIntensity(1);
