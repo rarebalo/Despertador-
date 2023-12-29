@@ -233,7 +233,7 @@ void pantallaHora() {
     miReloj.setMinutos(minute(tiempoActual));
     miReloj.setHora(hour(tiempoActual));
     caracter = diasDeLaSemana[weekday(tiempoActual) - 1];
-    if (contadorSegundos < 11) {
+    if (contadorSegundos < 1) {
       contadorSegundos++;
     } else {
       contadorSegundos = 0;
@@ -271,7 +271,7 @@ void pantallaHora() {
         caminoSegundo--;  
       }
 
-      if (caminoSegundo == 1 || caminoSegundo == 6) {
+      if (caminoSegundo == 2 || caminoSegundo == 5) {
         incrementando = !incrementando; 
       }
 
