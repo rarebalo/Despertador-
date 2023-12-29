@@ -125,8 +125,9 @@ bool ultimaConfigAlarma = false;
 bool visualizacionSegundos = false;
 int contadorSegundos = 0;
 bool entraPrimeraVez = true;
-int caminoSegundo = 0;
-int caminoSegundoAnterior = 0;
+int caminoSegundo = 3;
+bool incrementando = true;
+bool visualizacionSegundosAnterior = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -256,13 +257,28 @@ void pantallaHora() {
 
   if (miReloj.sonar) {
     pantallaDeError();
-  } 
-
-  if (visualizacionSegundos) {
-    matrix.drawPixel(24, 6, HIGH);
-  } else {
-    matrix.drawPixel(24, 6, LOW);
   }
+  
+  if (visualizacionSegundos != visualizacionSegundosAnterior) { 
+    visualizacionSegundosAnterior = visualizacionSegundos;       
+
+    if (visualizacionSegundos) {
+      matrix.drawPixel(24, caminoSegundo, LOW);  
+
+      if (incrementando) {
+        caminoSegundo++;  
+      } else {
+        caminoSegundo--;  
+      }
+
+      if (caminoSegundo == 1 || caminoSegundo == 6) {
+        incrementando = !incrementando; 
+      }
+
+      matrix.drawPixel(24, caminoSegundo, HIGH); 
+    }
+  }
+  matrix.drawPixel(24, caminoSegundo, HIGH);
 
   if (dolorDeCabeza) {
     matrix.drawPixel(8, 7, HIGH);
@@ -412,9 +428,9 @@ void limpiarPantalla() {
 }
 
 void pantallaDeError() {
-  if(random(0, 2) == 1){
+  if (random(0, 2) == 1) {
     matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
-  }else{
+  } else {
     matrix.drawPixel(random(0, 32), random(0, 8), LOW);
   }
   matrix.write();
