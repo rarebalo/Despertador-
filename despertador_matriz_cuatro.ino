@@ -136,6 +136,10 @@ int mesAjus;
 int diaAjus;
 bool cargarVariablesAjusHora = true;
 bool configHoraManual = false;
+int filaAjus;
+int columnaAjus;
+int trianguloUno,trianguloDos,trianguloTres;
+unsigned long tiempoTriangulo = millis();
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -161,10 +165,12 @@ void mostrarAjusHora() {
   char ajusHoraMostrar[5];
   snprintf(strajusHoraMostrar, sizeof(strajusHoraMostrar), "%02d%02d", horaAjus, minAjus);
   strncpy(ajusHoraMostrar, strajusHoraMostrar, sizeof(ajusHoraMostrar));
- matrix.fillScreen(LOW);
+  matrix.fillScreen(LOW);
   for (int i = 0; i < 4; i++) {
     matrix.drawChar(i * 6, 0, ajusHoraMostrar[i], HIGH, LOW, 1);
   }
+  formasDelTriangulo();
+  matrix.drawTriangle(trianguloUno, 0, trianguloDos, 3, trianguloTres, 7, HIGH);
   matrix.write();
 }
 
@@ -407,10 +413,9 @@ void actualizarHora() {
 }
 
 void mostrarTemperatura() {
-  float temperaturaFloat = rtc.getTemperature();               // Obtener la temperatura como float
-  int temperaturaEntera = static_cast<int>(temperaturaFloat);  // Convertir el float a entero
+  float temperaturaFloat = rtc.getTemperature();
+  int temperaturaEntera = static_cast<int>(temperaturaFloat);
 
-  // Calcular la parte decimal multiplicando por 100 y restando la parte entera
   int temperaturaDecimal = static_cast<int>((temperaturaFloat - temperaturaEntera) * 100);
 
   char stringAMostrar[6];
@@ -433,7 +438,7 @@ void finDeSonido() {
 
 void modificarBrillo() {
 
-  char numeroBrillo[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
     if (!entraPrimeraVez) {
       brillo++;
@@ -497,6 +502,15 @@ void pilotoDelSegundo() {
     }
   }
   matrix.drawPixel(24, caminoSegundo, HIGH);
+}
+
+void formasDelTriangulo(){
+  if(millis() - tiempoTriangulo > 1000){
+    tiempoTriangulo = millis();
+    trianguloUno = random(23,32);
+    trianguloDos = random(23,32);
+    trianguloTres = random(23,32);
+  }
 }
 
 
