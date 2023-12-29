@@ -139,6 +139,7 @@ bool configHoraManual = false;
 int filaAjus;
 int columnaAjus;
 int trianguloUno,trianguloDos,trianguloTres;
+int trianguloUnoY,trianguloDosY,trianguloTresY;
 unsigned long tiempoTriangulo = millis();
 
 bool ejecutarCada(int tiempo) {
@@ -170,7 +171,7 @@ void mostrarAjusHora() {
     matrix.drawChar(i * 6, 0, ajusHoraMostrar[i], HIGH, LOW, 1);
   }
   formasDelTriangulo();
-  matrix.drawTriangle(trianguloUno, 0, trianguloDos, 3, trianguloTres, 7, HIGH);
+  matrix.drawTriangle(trianguloUno, trianguloUnoY, trianguloDos, trianguloDosY, trianguloTres, trianguloTresY, HIGH);
   matrix.write();
 }
 
@@ -505,11 +506,14 @@ void pilotoDelSegundo() {
 }
 
 void formasDelTriangulo(){
-  if(millis() - tiempoTriangulo > 1000){
+  if(millis() - tiempoTriangulo > 500){
     tiempoTriangulo = millis();
     trianguloUno = random(23,32);
     trianguloDos = random(23,32);
     trianguloTres = random(23,32);
+    trianguloUnoY = random(0,8);
+    trianguloDosY = random(0,8);
+    trianguloTresY = random(0,8);
   }
 }
 
