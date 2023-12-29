@@ -125,6 +125,8 @@ bool ultimaConfigAlarma = false;
 bool visualizacionSegundos = false;
 int contadorSegundos = 0;
 bool entraPrimeraVez = true;
+int caminoSegundo = 0;
+int caminoSegundoAnterior = 0;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -253,10 +255,8 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    matrix.drawPixel(24, 1, HIGH);
-  } else {
-    matrix.drawPixel(24, 1, LOW);
-  }
+    pantallaDeError();
+  } 
 
   if (visualizacionSegundos) {
     matrix.drawPixel(24, 6, HIGH);
@@ -264,7 +264,7 @@ void pantallaHora() {
     matrix.drawPixel(24, 6, LOW);
   }
 
-  if(dolorDeCabeza){
+  if (dolorDeCabeza) {
     matrix.drawPixel(8, 7, HIGH);
   }
 
@@ -325,11 +325,11 @@ void monitoreoAlarma() {
     brillo = 0;
   }
 
-  if (dolorDeCabeza) {    
+  if (dolorDeCabeza) {
     buzzerBrilloActivado();
   }
 
-  if(miReloj.minutosAlarma != miReloj.minutos){
+  if (miReloj.minutosAlarma != miReloj.minutos) {
     miReloj.setSonar(EEPROM.read(20));
   }
 }
@@ -379,8 +379,8 @@ void modificarBrillo() {
 
   char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
-    if(!entraPrimeraVez){
-       brillo++;
+    if (!entraPrimeraVez) {
+      brillo++;
     }
     entraPrimeraVez = false;
     matrix.fillScreen(LOW);
@@ -409,6 +409,15 @@ void limpiarPantalla() {
   matrix.fillScreen(LOW);
   matrix.write();
   entraPrimeraVez = true;
+}
+
+void pantallaDeError() {
+  if(random(0, 2) == 1){
+    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
+  }else{
+    matrix.drawPixel(random(0, 32), random(0, 8), LOW);
+  }
+  matrix.write();
 }
 
 
@@ -447,7 +456,6 @@ void setup() {
   if (millis() - esperaEntreSonidos > 3000) {
     esperaEntreSonidos = millis();
     EasyBuzzer.beep(1500, 200, 50, 3, 500, 1, finDeSonido);
-    //EasyBuzzer.beep(1500, 3);
   }
 }
 
@@ -463,12 +471,14 @@ void loop() {
       matrix.setIntensity(brillo);
       pantallaHora();
       monitoreoAlarma();
+      //pantallaDeError();
       break;
     case 1:
       //no anda ajustar hora
-      matrix.setIntensity(3);
+      /*matrix.setIntensity(3);
       ajustarHora();
-      pantallaHora();
+      pantallaHora();*/
+      pantallaDeError();
       break;
     case 2:
       matrix.setIntensity(1);
