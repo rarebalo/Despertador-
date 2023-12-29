@@ -91,27 +91,27 @@ public:
   }
 };
 
-const byte  tiempoRebote = 180;
+const byte tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
 
 Reloj miReloj;
 RTC_DS3231 rtc;
 
-byte  alarmaMin = 0;
-byte  alarmaHora = 0;
+byte alarmaMin = 0;
+byte alarmaHora = 0;
 
-const byte  pinCS = 10;
-const byte  numberOfHorizontalDisplays = 4;
-const byte  numberOfVerticalDisplays = 1;
+const byte pinCS = 10;
+const byte numberOfHorizontalDisplays = 4;
+const byte numberOfVerticalDisplays = 1;
 Max72xxPanel matrix = Max72xxPanel(pinCS, numberOfHorizontalDisplays, numberOfVerticalDisplays);
 
-const byte  buzzer = 9;
-const byte  button0 = 3;
-const byte  button1 = 4;
-const byte  button2 = 5;
-const byte  button3 = 6;
-const byte  button4 = 2;
+const byte buzzer = 9;
+const byte button0 = 3;
+const byte button1 = 4;
+const byte button2 = 5;
+const byte button3 = 6;
+const byte button4 = 2;
 unsigned long tiempoInicio = millis();
 unsigned long esperaEntreSonidos = 1000;
 byte modo = 0;
@@ -128,6 +128,14 @@ bool entraPrimeraVez = true;
 byte caminoSegundo = 3;
 bool incrementando = true;
 bool visualizacionSegundosAnterior = false;
+int horaAjus;
+int minAjus;
+int segAjus;
+int anioAjus;
+int mesAjus;
+int diaAjus;
+bool cargarVariablesAjusHora = true;
+bool configHoraManual = false;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -147,6 +155,17 @@ void mostrarAlarma() {
   for (int i = 0; i < 4; i++) {
     matrix.drawChar(i * 6, 0, miReloj.getDisplayAlarma()[i], HIGH, LOW, 1);
   }
+}
+void mostrarAjusHora() {
+  char strajusHoraMostrar[5];
+  char ajusHoraMostrar[5];
+  snprintf(strajusHoraMostrar, sizeof(strajusHoraMostrar), "%02d%02d", horaAjus, minAjus);
+  strncpy(ajusHoraMostrar, strajusHoraMostrar, sizeof(ajusHoraMostrar));
+ matrix.fillScreen(LOW);
+  for (int i = 0; i < 4; i++) {
+    matrix.drawChar(i * 6, 0, ajusHoraMostrar[i], HIGH, LOW, 1);
+  }
+  matrix.write();
 }
 
 bool presionandoBtn(int btn) {
@@ -183,20 +202,60 @@ bool presionandoBtn(int btn) {
 }
 
 void ajustarHora() {
+
+  cargarVarAjusHora();
   if (presionandoBtn(button4)) {
-    adjustTime(3600);
+    horaAjus++;
+    if (horaAjus > 23) {
+      horaAjus = 0;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button1)) {
-    adjustTime(60);
+    minAjus++;
+    if (minAjus > 59) {
+      minAjus = 0;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button0)) {
-    adjustTime(-3600);
+    horaAjus--;
+    if (horaAjus < 0) {
+      horaAjus = 23;
+    }
+    configHoraManual = true;
   }
 
   if (presionandoBtn(button2)) {
-    adjustTime(-60);
+    minAjus--;
+    if (minAjus < 0) {
+      minAjus = 59;
+    }
+    configHoraManual = true;
+  }
+  mostrarAjusHora();
+}
+
+void actualizarHoraManual() {
+  if (configHoraManual) {
+    configHoraManual = false;
+    rtc.adjust(DateTime(anioAjus, mesAjus, diaAjus, horaAjus, minAjus, segAjus));
+  }
+  cargarVariablesAjusHora = true;
+}
+
+void cargarVarAjusHora() {
+  if (cargarVariablesAjusHora) {
+    cargarVariablesAjusHora = false;
+    time_t tiempoActual = now();
+    anioAjus = year(tiempoActual);
+    mesAjus = month(tiempoActual);
+    diaAjus = weekday(tiempoActual);
+    horaAjus = hour(tiempoActual);
+    minAjus = minute(tiempoActual);
+    segAjus = second(tiempoActual);
   }
 }
 
@@ -256,13 +315,13 @@ void pantallaHora() {
   }
 
   if (miReloj.sonar) {
-    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);    
+    matrix.drawPixel(random(0, 32), random(0, 8), HIGH);
   }
 
   pilotoDelSegundo();
-  
+
   if (dolorDeCabeza) {
-    matrix.drawPixel(8, 7, HIGH);    
+    matrix.drawPixel(8, 7, HIGH);
   }
 
   matrix.write();
@@ -374,7 +433,7 @@ void finDeSonido() {
 
 void modificarBrillo() {
 
-  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15' };
+  char numeroBrillo[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
   if (presionandoBtn(button4) || entraPrimeraVez) {
     if (!entraPrimeraVez) {
       brillo++;
@@ -417,28 +476,28 @@ void pantallaDeError() {
   matrix.write();
 }
 
-void pilotoDelSegundo(){
-    if (visualizacionSegundos != visualizacionSegundosAnterior) { 
-    visualizacionSegundosAnterior = visualizacionSegundos;       
+void pilotoDelSegundo() {
+  if (visualizacionSegundos != visualizacionSegundosAnterior) {
+    visualizacionSegundosAnterior = visualizacionSegundos;
 
     if (visualizacionSegundos) {
-      matrix.drawPixel(24, caminoSegundo, LOW);  
+      matrix.drawPixel(24, caminoSegundo, LOW);
 
       if (incrementando) {
-        caminoSegundo++;  
+        caminoSegundo++;
       } else {
-        caminoSegundo--;  
+        caminoSegundo--;
       }
 
       if (caminoSegundo == 2 || caminoSegundo == 5) {
-        incrementando = !incrementando; 
+        incrementando = !incrementando;
       }
 
-      matrix.drawPixel(24, caminoSegundo, HIGH); 
+      matrix.drawPixel(24, caminoSegundo, HIGH);
     }
   }
   matrix.drawPixel(24, caminoSegundo, HIGH);
-  }
+}
 
 
 void setup() {
@@ -491,16 +550,12 @@ void loop() {
       matrix.setIntensity(brillo);
       pantallaHora();
       monitoreoAlarma();
-      //pantallaDeError();
       break;
     case 1:
-      //no anda ajustar hora
-      /*matrix.setIntensity(3);
       ajustarHora();
-      pantallaHora();*/
-      pantallaDeError();
       break;
     case 2:
+      actualizarHoraManual();
       matrix.setIntensity(1);
       ajustarAlarma();
       pantallaAlarma();
