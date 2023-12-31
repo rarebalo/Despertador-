@@ -138,9 +138,11 @@ bool cargarVariablesAjusHora = true;
 bool configHoraManual = false;
 int filaAjus;
 int columnaAjus;
-int trianguloUno,trianguloDos,trianguloTres;
-int trianguloUnoY,trianguloDosY,trianguloTresY;
+int trianguloUno, trianguloDos, trianguloTres;
+int trianguloUnoY, trianguloDosY, trianguloTresY;
 unsigned long tiempoTriangulo = millis();
+unsigned long tiempoSegundos = millis();
+bool seMuestra = true;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -331,6 +333,8 @@ void pantallaHora() {
     matrix.drawPixel(8, 7, HIGH);
   }
 
+  visualizacionSegundosTradi();
+
   matrix.write();
 }
 
@@ -429,7 +433,7 @@ void mostrarTemperatura() {
   for (int i = 0; i < 5; i++) {
     matrix.drawChar(i * 6, 0, stringAMostrar[i], HIGH, LOW, 1);
   }
-  matrix.drawPixel(10, 6, HIGH);
+  matrix.drawPixel(11, 6, HIGH);
   matrix.drawChar(4 * 6 + 2, 0, 'C', HIGH, LOW, 1);
   matrix.write();
 }
@@ -505,15 +509,29 @@ void pilotoDelSegundo() {
   matrix.drawPixel(24, caminoSegundo, HIGH);
 }
 
-void formasDelTriangulo(){
-  if(millis() - tiempoTriangulo > 500){
+void formasDelTriangulo() {
+  if (millis() - tiempoTriangulo > 500) {
     tiempoTriangulo = millis();
-    trianguloUno = random(23,32);
-    trianguloDos = random(23,32);
-    trianguloTres = random(23,32);
-    trianguloUnoY = random(0,8);
-    trianguloDosY = random(0,8);
-    trianguloTresY = random(0,8);
+    trianguloUno = random(23, 32);
+    trianguloDos = random(23, 32);
+    trianguloTres = random(23, 32);
+    trianguloUnoY = random(0, 8);
+    trianguloDosY = random(0, 8);
+    trianguloTresY = random(0, 8);
+  }
+}
+
+void visualizacionSegundosTradi() {
+  int columnaRam;
+  if (millis() - tiempoSegundos > 1000) {
+    tiempoSegundos = millis();
+    seMuestra = !seMuestra;
+    columnaRam = random(0,7);
+  }
+  if (seMuestra) {
+    matrix.drawPixel(11,columnaRam, HIGH);
+  }else{
+    matrix.drawPixel(11,columnaRam, LOW);
   }
 }
 
