@@ -522,16 +522,16 @@ void formasDelTriangulo() {
 }
 
 void visualizacionSegundosTradi() {
+  int columnaRam;
   if (millis() - tiempoSegundos > 1000) {
     tiempoSegundos = millis();
     seMuestra = !seMuestra;
+    columnaRam = random(0,7);
   }
   if (seMuestra) {
-    matrix.drawPixel(11,4, HIGH);
-    matrix.drawPixel(11,2, HIGH);
+    matrix.drawPixel(11,columnaRam, HIGH);
   }else{
-    matrix.drawPixel(11,4, LOW);
-    matrix.drawPixel(11,2, LOW);
+    matrix.drawPixel(11,columnaRam, LOW);
   }
 }
 
