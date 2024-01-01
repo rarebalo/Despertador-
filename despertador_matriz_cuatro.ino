@@ -143,6 +143,8 @@ int trianguloUnoY, trianguloDosY, trianguloTresY;
 unsigned long tiempoTriangulo = millis();
 unsigned long tiempoSegundos = millis();
 bool seMuestra = true;
+unsigned long tiempoCrono = millis();
+bool vueta = true;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -526,12 +528,17 @@ void visualizacionSegundosTradi() {
   if (millis() - tiempoSegundos > 1000) {
     tiempoSegundos = millis();
     seMuestra = !seMuestra;
-    columnaRam = random(0,7);
+    columnaRam = random(0, 7);
   }
   if (seMuestra) {
-    matrix.drawPixel(11,columnaRam, HIGH);
-  }else{
-    matrix.drawPixel(11,columnaRam, LOW);
+    matrix.drawPixel(11, columnaRam, HIGH);
+  } else {
+    matrix.drawPixel(11, columnaRam, LOW);
+  }
+}
+void crono(){
+if (presionandoBtn(button4)) {
+  
   }
 }
 
@@ -605,6 +612,9 @@ void loop() {
       break;
     case 5:
       modificarBrillo();
+      break;
+    case 6:
+    crono();
       break;
     default:
       modo = 0;
