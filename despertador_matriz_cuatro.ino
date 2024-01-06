@@ -138,13 +138,18 @@ bool cargarVariablesAjusHora = true;
 bool configHoraManual = false;
 int filaAjus;
 int columnaAjus;
-int trianguloUno, trianguloDos, trianguloTres;
-int trianguloUnoY, trianguloDosY, trianguloTresY;
 unsigned long tiempoTriangulo = millis();
 unsigned long tiempoSegundos = millis();
 bool seMuestra = true;
 unsigned long tiempoCrono = millis();
 bool vueta = true;
+
+int trianguloUno = random(23, 32);
+int trianguloDos = random(23, 32);
+int trianguloTres = random(23, 32);
+int trianguloUnoY = random(0, 8);
+int trianguloDosY = random(0, 8);
+int trianguloTresY = random(0, 8);
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -514,12 +519,24 @@ void pilotoDelSegundo() {
 void formasDelTriangulo() {
   if (millis() - tiempoTriangulo > 500) {
     tiempoTriangulo = millis();
-    trianguloUno = random(23, 32);
-    trianguloDos = random(23, 32);
-    trianguloTres = random(23, 32);
-    trianguloUnoY = random(0, 8);
-    trianguloDosY = random(0, 8);
-    trianguloTresY = random(0, 8);
+    trianguloUno = puntaDeTriangulo(trianguloUno, 23, 32);
+    trianguloDos = puntaDeTriangulo(trianguloDos, 23, 32);
+    trianguloTres = puntaDeTriangulo(trianguloTres, 23, 32);
+    trianguloUnoY = puntaDeTriangulo(trianguloUnoY, 0, 8);
+    trianguloDosY = puntaDeTriangulo(trianguloDosY, 0, 8);
+    trianguloTresY = puntaDeTriangulo(trianguloTresY, 0, 8);
+  }
+}
+
+int puntaDeTriangulo(int triangulo, int limiteBajo, int limiteAlto) {
+  if (triangulo > limiteAlto || triangulo < limiteBajo) {
+    if (random(0, 2) == 0) {
+      return triangulo++;
+    } else {
+      return triangulo--;
+    }
+  } else {
+    return triangulo = random(limiteBajo, limiteAlto);
   }
 }
 
@@ -536,9 +553,8 @@ void visualizacionSegundosTradi() {
     matrix.drawPixel(11, columnaRam, LOW);
   }
 }
-void crono(){
-if (presionandoBtn(button4)) {
-  
+void crono() {
+  if (presionandoBtn(button4)) {
   }
 }
 
@@ -614,7 +630,7 @@ void loop() {
       modificarBrillo();
       break;
     case 6:
-    crono();
+      crono();
       break;
     default:
       modo = 0;
