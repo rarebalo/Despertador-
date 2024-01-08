@@ -344,7 +344,7 @@ void pantallaHora() {
     matrix.drawPixel(8, 7, HIGH);
   }
 
-  visualizacionSegundosTradi();
+  visualizacionSegundosTradi();  
 
   matrix.write();
 }
@@ -592,7 +592,7 @@ void crono() {
 
 void pantallaCrono() {
   char strCrono[8];
-  snprintf(strCrono, sizeof(strCrono), "%02d:%02d:%02d", minutoCrono, segundoCrono, centecimaCrono);
+  snprintf(strCrono, sizeof(strCrono), "%02d%02d%02d", minutoCrono, segundoCrono, centecimaCrono);
   matrix.fillScreen(LOW);
   for (int i = 0; i < 8; i++) {
     matrix.drawChar(i * 6, 0, strCrono[i], HIGH, LOW, 1);
