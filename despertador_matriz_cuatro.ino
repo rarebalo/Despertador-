@@ -143,6 +143,9 @@ unsigned long tiempoSegundos = millis();
 bool seMuestra = true;
 unsigned long tiempoCrono = millis();
 bool vueta = true;
+int centecimaCrono = 0;
+int segundoCrono = 0;
+int minutoCrono = 0;
 
 int trianguloUno = random(23, 32);
 int trianguloDos = random(23, 32);
@@ -555,10 +558,25 @@ void visualizacionSegundosTradi() {
 }
 void crono() {
   if (presionandoBtn(button4)) {
+    
   }
 
-  if(millis()-tiempoCrono > 1000){
+  if (millis() - tiempoCrono > 10) {
     tiempoCrono = millis();
+    centecimaCrono++;
+  }
+  if (centecimaCrono >= 100) {
+    centecimaCrono = 0;
+    segundoCrono++;
+  }
+
+  if (segundoCrono >= 60) {
+    segundoCrono = 0;
+    minutoCrono++;
+  }
+
+  if (minutoCrono >= 100) {
+    minutoCrono = 0;
   }
 }
 
