@@ -143,6 +143,7 @@ unsigned long tiempoSegundos = millis();
 bool seMuestra = true;
 unsigned long tiempoCrono = millis();
 bool vueta = true;
+bool pararCrono = true;
 int centecimaCrono = 0;
 int segundoCrono = 0;
 int minutoCrono = 0;
@@ -558,25 +559,33 @@ void visualizacionSegundosTradi() {
 }
 void crono() {
   if (presionandoBtn(button4)) {
-    
+    pararCrono = !pararCrono;
   }
 
-  if (millis() - tiempoCrono > 10) {
-    tiempoCrono = millis();
-    centecimaCrono++;
-  }
-  if (centecimaCrono >= 100) {
+  if (presionandoBtn(button0)) {
     centecimaCrono = 0;
-    segundoCrono++;
-  }
-
-  if (segundoCrono >= 60) {
     segundoCrono = 0;
-    minutoCrono++;
+    minutoCrono = 0;
   }
 
-  if (minutoCrono >= 100) {
-    minutoCrono = 0;
+  if (!pararCrono) {
+    if (millis() - tiempoCrono > 10) {
+      tiempoCrono = millis();
+      centecimaCrono++;
+    }
+    if (centecimaCrono >= 100) {
+      centecimaCrono = 0;
+      segundoCrono++;
+    }
+
+    if (segundoCrono >= 60) {
+      segundoCrono = 0;
+      minutoCrono++;
+    }
+
+    if (minutoCrono >= 100) {
+      minutoCrono = 0;
+    }
   }
 }
 
