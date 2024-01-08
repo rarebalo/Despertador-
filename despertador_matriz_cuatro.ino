@@ -556,6 +556,10 @@ void visualizacionSegundosTradi() {
 void crono() {
   if (presionandoBtn(button4)) {
   }
+
+  if(millis()-tiempoCrono > 1000){
+    tiempoCrono = millis();
+  }
 }
 
 
