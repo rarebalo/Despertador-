@@ -587,7 +587,20 @@ void crono() {
       minutoCrono = 0;
     }
   }
+  pantallaCrono();
 }
+
+void pantallaCrono() {
+  char strCrono[8];
+  snprintf(strCrono, sizeof(strCrono), "%02d%02d%02d", minutoCrono, segundoCrono, centecimaCrono);
+  matrix.fillScreen(LOW);
+  for (int i = 0; i < 8; i++) {
+    matrix.drawChar(i * 6, 0, strCrono[i], HIGH, LOW, 1);
+  }
+  matrix.write();
+}
+
+
 
 
 void setup() {
