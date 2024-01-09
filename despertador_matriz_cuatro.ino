@@ -344,7 +344,7 @@ void pantallaHora() {
     matrix.drawPixel(8, 7, HIGH);
   }
 
-  visualizacionSegundosTradi();  
+  visualizacionSegundosTradi();
 
   matrix.write();
 }
