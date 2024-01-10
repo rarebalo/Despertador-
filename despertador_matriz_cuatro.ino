@@ -558,6 +558,12 @@ void visualizacionSegundosTradi() {
   }
 }
 void crono() {
+  static unsigned long tiempoCrono = 0;
+  static int centecimaCrono = 0;
+  static int segundoCrono = 0;
+  static int minutoCrono = 0;
+  static bool pararCrono = false;
+
   if (presionandoBtn(button4)) {
     pararCrono = !pararCrono;
   }
@@ -568,23 +574,16 @@ void crono() {
     minutoCrono = 0;
   }
 
-  if (!pararCrono) {
-    if (millis() - tiempoCrono > 10) {
-      tiempoCrono = millis();
-      centecimaCrono++;
-    }
-    if (centecimaCrono >= 100) {
+  if (!pararCrono && millis() - tiempoCrono > 10) {
+    tiempoCrono = millis();
+    if (++centecimaCrono >= 100) {
       centecimaCrono = 0;
-      segundoCrono++;
-    }
-
-    if (segundoCrono >= 60) {
-      segundoCrono = 0;
-      minutoCrono++;
-    }
-
-    if (minutoCrono >= 100) {
-      minutoCrono = 0;
+      if (++segundoCrono >= 60) {
+        segundoCrono = 0;
+        if (++minutoCrono >= 100) {
+          minutoCrono = 0;
+        }
+      }
     }
   }
   pantallaCrono();
