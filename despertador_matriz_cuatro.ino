@@ -453,13 +453,15 @@ void finDeSonido() {
 }
 
 void modificarBrillo() {
+  static bool entraPrimeraVez = true;
+  static int brillo = 0;
 
-  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
     if (!entraPrimeraVez) {
-      brillo++;
+      brillo = (brillo + 1) % 10;
     }
     entraPrimeraVez = false;
+
     matrix.fillScreen(LOW);
     matrix.setIntensity(brillo);
 
@@ -468,17 +470,10 @@ void modificarBrillo() {
         matrix.drawPixel(i, o, HIGH);
       }
     }
+
     matrix.drawPixel(8, 7, HIGH);
-    matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
+    matrix.drawChar(4 * 6 + 2, 0, '0' + brillo, HIGH, LOW, 1);
     matrix.write();
-    if (brillo == 10) {
-      brillo = 0;
-      matrix.fillScreen(LOW);
-      matrix.setIntensity(brillo);
-      matrix.drawPixel(8, 7, HIGH);
-      matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
-      matrix.write();
-    }
   }
 }
 
@@ -498,17 +493,17 @@ void pantallaDeError() {
 }
 
 void pilotoDelSegundo() {
+  static bool visualizacionSegundosAnterior = false;
+  static int caminoSegundo = 0;
+  static bool incrementando = true;
+
   if (visualizacionSegundos != visualizacionSegundosAnterior) {
     visualizacionSegundosAnterior = visualizacionSegundos;
 
     if (visualizacionSegundos) {
       matrix.drawPixel(24, caminoSegundo, LOW);
 
-      if (incrementando) {
-        caminoSegundo++;
-      } else {
-        caminoSegundo--;
-      }
+      caminoSegundo += incrementando ? 1 : -1;
 
       if (caminoSegundo == 2 || caminoSegundo == 5) {
         incrementando = !incrementando;
@@ -545,19 +540,26 @@ int puntaDeTriangulo(int triangulo, int limiteBajo, int limiteAlto) {
 }
 
 void visualizacionSegundosTradi() {
-  int columnaRam;
+  static unsigned long tiempoSegundos = 0;
+  static bool seMuestra = false;
+  static int columnaRam = 0;
+
   if (millis() - tiempoSegundos > 1000) {
     tiempoSegundos = millis();
     seMuestra = !seMuestra;
     columnaRam = random(0, 7);
   }
-  if (seMuestra) {
-    matrix.drawPixel(11, columnaRam, HIGH);
-  } else {
-    matrix.drawPixel(11, columnaRam, LOW);
-  }
+
+  matrix.drawPixel(11, columnaRam, seMuestra ? HIGH : LOW);
 }
+
 void crono() {
+  static unsigned long tiempoCrono = 0;
+  static int centecimaCrono = 0;
+  static int segundoCrono = 0;
+  static int minutoCrono = 0;
+  static bool pararCrono = false;
+
   if (presionandoBtn(button4)) {
     pararCrono = !pararCrono;
   }
@@ -568,23 +570,16 @@ void crono() {
     minutoCrono = 0;
   }
 
-  if (!pararCrono) {
-    if (millis() - tiempoCrono > 10) {
-      tiempoCrono = millis();
-      centecimaCrono++;
-    }
-    if (centecimaCrono >= 100) {
+  if (!pararCrono && millis() - tiempoCrono > 10) {
+    tiempoCrono = millis();
+    if (++centecimaCrono >= 100) {
       centecimaCrono = 0;
-      segundoCrono++;
-    }
-
-    if (segundoCrono >= 60) {
-      segundoCrono = 0;
-      minutoCrono++;
-    }
-
-    if (minutoCrono >= 100) {
-      minutoCrono = 0;
+      if (++segundoCrono >= 60) {
+        segundoCrono = 0;
+        if (++minutoCrono >= 100) {
+          minutoCrono = 0;
+        }
+      }
     }
   }
   pantallaCrono();
