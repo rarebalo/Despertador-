@@ -498,17 +498,17 @@ void pantallaDeError() {
 }
 
 void pilotoDelSegundo() {
+  static bool visualizacionSegundosAnterior = false;
+  static int caminoSegundo = 0;
+  static bool incrementando = true;
+
   if (visualizacionSegundos != visualizacionSegundosAnterior) {
     visualizacionSegundosAnterior = visualizacionSegundos;
 
     if (visualizacionSegundos) {
       matrix.drawPixel(24, caminoSegundo, LOW);
 
-      if (incrementando) {
-        caminoSegundo++;
-      } else {
-        caminoSegundo--;
-      }
+      caminoSegundo += incrementando ? 1 : -1;
 
       if (caminoSegundo == 2 || caminoSegundo == 5) {
         incrementando = !incrementando;
