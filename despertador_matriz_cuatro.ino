@@ -545,18 +545,19 @@ int puntaDeTriangulo(int triangulo, int limiteBajo, int limiteAlto) {
 }
 
 void visualizacionSegundosTradi() {
-  int columnaRam;
+  static unsigned long tiempoSegundos = 0;
+  static bool seMuestra = false;
+  static int columnaRam = 0;
+
   if (millis() - tiempoSegundos > 1000) {
     tiempoSegundos = millis();
     seMuestra = !seMuestra;
     columnaRam = random(0, 7);
   }
-  if (seMuestra) {
-    matrix.drawPixel(11, columnaRam, HIGH);
-  } else {
-    matrix.drawPixel(11, columnaRam, LOW);
-  }
+
+  matrix.drawPixel(11, columnaRam, seMuestra ? HIGH : LOW);
 }
+
 void crono() {
   static unsigned long tiempoCrono = 0;
   static int centecimaCrono = 0;
