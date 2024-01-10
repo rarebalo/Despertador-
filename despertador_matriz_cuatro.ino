@@ -382,7 +382,7 @@ bool estadoAlarma() {
 
 void subirBrillo() {
   brillo++;
-  if (brillo == 10) {
+  if (brillo == 16) {
     brillo = 0;
   }
 }
