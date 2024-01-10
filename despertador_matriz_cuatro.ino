@@ -453,13 +453,15 @@ void finDeSonido() {
 }
 
 void modificarBrillo() {
+  static bool entraPrimeraVez = true;
+  static int brillo = 0;
 
-  char numeroBrillo[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
   if (presionandoBtn(button4) || entraPrimeraVez) {
     if (!entraPrimeraVez) {
-      brillo++;
+      brillo = (brillo + 1) % 10;
     }
     entraPrimeraVez = false;
+
     matrix.fillScreen(LOW);
     matrix.setIntensity(brillo);
 
@@ -468,17 +470,10 @@ void modificarBrillo() {
         matrix.drawPixel(i, o, HIGH);
       }
     }
+
     matrix.drawPixel(8, 7, HIGH);
-    matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
+    matrix.drawChar(4 * 6 + 2, 0, '0' + brillo, HIGH, LOW, 1);
     matrix.write();
-    if (brillo == 10) {
-      brillo = 0;
-      matrix.fillScreen(LOW);
-      matrix.setIntensity(brillo);
-      matrix.drawPixel(8, 7, HIGH);
-      matrix.drawChar(4 * 6 + 2, 0, numeroBrillo[brillo], HIGH, LOW, 1);
-      matrix.write();
-    }
   }
 }
 
