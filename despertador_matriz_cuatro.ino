@@ -5,7 +5,11 @@
 #include <Wire.h>
 #include <RTClib.h>
 #include <EEPROM.h>
-
+//#include <IRremote.h>
+/*
+int pinIR = 2; // Puerto de entrada para el módulo infrarrojo
+IRsend irsend;
+*/
 
 
 class Reloj {
@@ -595,7 +599,11 @@ void pantallaCrono() {
   matrix.write();
 }
 
-
+/*
+void disparoCamara(){
+  irsend.sendNEC(0x20DF10EF, 32);
+}
+*/
 
 
 void setup() {
