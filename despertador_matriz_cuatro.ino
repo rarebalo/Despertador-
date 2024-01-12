@@ -216,9 +216,6 @@ int trianguloUnoY = random(0, 8);
 int trianguloDosY = random(0, 8);
 int trianguloTresY = random(0, 8);
 
-int playerUno = 0;
-int playerDos = 0;
-
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
     tiempoInicio = millis();
