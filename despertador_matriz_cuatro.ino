@@ -101,7 +101,6 @@ class Jugador {
     int partidasJugadas;
     int partidasPerdidas;
     int partidasGanadas;
-    int partidasEmpatadas;
     int puntosPartidaActual;
     int rachaVictorias;
     int puntosTotales;
@@ -111,34 +110,29 @@ class Jugador {
       partidasJugadas = 0;
       partidasPerdidas = 0;
       partidasGanadas = 0;
-      partidasEmpatadas = 0;
       puntosPartidaActual = 0;
       rachaVictorias = 0;
       puntosTotales = 0;
     }
 
     void ganarPartida() {
-      partidasJugadas++;
-      partidasGanadas++;
-      rachaVictorias++;
-      puntosTotales += puntosPartidaActual;
-      reiniciarPuntosPartida();
+      if (puntosPartidaActual >= 11 && puntosPartidaActual - puntosPartidaActual >= 2) {
+        partidasJugadas++;
+        partidasGanadas++;
+        rachaVictorias++;
+        puntosTotales += puntosPartidaActual;
+        reiniciarPuntosPartida();
+      }
     }
 
     void perderPartida() {
-      partidasJugadas++;
-      partidasPerdidas++;
-      rachaVictorias = 0;
-      puntosTotales += puntosPartidaActual;
-      reiniciarPuntosPartida();
-    }
-
-    void empatarPartida() {
-      partidasJugadas++;
-      partidasEmpatadas++;
-      rachaVictorias = 0;
-      puntosTotales += puntosPartidaActual;
-      reiniciarPuntosPartida();
+      if (puntosPartidaActual <= 9 || puntosPartidaActual - puntosPartidaActual < 2) {
+        partidasJugadas++;
+        partidasPerdidas++;
+        rachaVictorias = 0;
+        puntosTotales += puntosPartidaActual;
+        reiniciarPuntosPartida();
+      }
     }
 
     void anotarPunto() {
@@ -670,6 +664,10 @@ void disparoCamara(){
   irsend.sendNEC(0x20DF10EF, 32);
 }
 */
+
+void pantallaTenis(){
+
+}
 
 
 void setup() {
