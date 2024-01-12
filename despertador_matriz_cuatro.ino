@@ -95,6 +95,69 @@ public:
   }
 };
 
+class Jugador {
+  public:
+    String nombre;
+    int partidasJugadas;
+    int partidasPerdidas;
+    int partidasGanadas;
+    int partidasEmpatadas;
+    int puntosPartidaActual;
+    int rachaVictorias;
+    int puntosTotales;
+
+    Jugador(String _nombre) {
+      nombre = _nombre;
+      partidasJugadas = 0;
+      partidasPerdidas = 0;
+      partidasGanadas = 0;
+      partidasEmpatadas = 0;
+      puntosPartidaActual = 0;
+      rachaVictorias = 0;
+      puntosTotales = 0;
+    }
+
+    void ganarPartida() {
+      partidasJugadas++;
+      partidasGanadas++;
+      rachaVictorias++;
+      puntosTotales += puntosPartidaActual;
+      reiniciarPuntosPartida();
+    }
+
+    void perderPartida() {
+      partidasJugadas++;
+      partidasPerdidas++;
+      rachaVictorias = 0;
+      puntosTotales += puntosPartidaActual;
+      reiniciarPuntosPartida();
+    }
+
+    void empatarPartida() {
+      partidasJugadas++;
+      partidasEmpatadas++;
+      rachaVictorias = 0;
+      puntosTotales += puntosPartidaActual;
+      reiniciarPuntosPartida();
+    }
+
+    void anotarPunto() {
+      puntosPartidaActual++;
+    }
+
+    void reiniciarPuntosPartida() {
+      puntosPartidaActual = 0;
+    }
+
+    float porcentajeVictorias() {
+      if (partidasJugadas > 0) {
+        return (float)partidasGanadas / partidasJugadas * 100;
+      } else {
+        return 0;
+      }
+    }
+};
+
 const byte tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
@@ -158,6 +221,9 @@ int trianguloTres = random(23, 32);
 int trianguloUnoY = random(0, 8);
 int trianguloDosY = random(0, 8);
 int trianguloTresY = random(0, 8);
+
+int playerUno = 0;
+int playerDos = 0;
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
