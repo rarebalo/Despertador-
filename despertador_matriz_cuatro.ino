@@ -95,6 +95,63 @@ public:
   }
 };
 
+class Jugador {
+  public:
+    String nombre;
+    int partidasJugadas;
+    int partidasPerdidas;
+    int partidasGanadas;
+    int puntosPartidaActual;
+    int rachaVictorias;
+    int puntosTotales;
+
+    Jugador(String _nombre) {
+      nombre = _nombre;
+      partidasJugadas = 0;
+      partidasPerdidas = 0;
+      partidasGanadas = 0;
+      puntosPartidaActual = 0;
+      rachaVictorias = 0;
+      puntosTotales = 0;
+    }
+
+    void ganarPartida() {
+      if (puntosPartidaActual >= 11 && puntosPartidaActual - puntosPartidaActual >= 2) {
+        partidasJugadas++;
+        partidasGanadas++;
+        rachaVictorias++;
+        puntosTotales += puntosPartidaActual;
+        reiniciarPuntosPartida();
+      }
+    }
+
+    void perderPartida() {
+      if (puntosPartidaActual <= 9 || puntosPartidaActual - puntosPartidaActual < 2) {
+        partidasJugadas++;
+        partidasPerdidas++;
+        rachaVictorias = 0;
+        puntosTotales += puntosPartidaActual;
+        reiniciarPuntosPartida();
+      }
+    }
+
+    void anotarPunto() {
+      puntosPartidaActual++;
+    }
+
+    void reiniciarPuntosPartida() {
+      puntosPartidaActual = 0;
+    }
+
+    float porcentajeVictorias() {
+      if (partidasJugadas > 0) {
+        return (float)partidasGanadas / partidasJugadas * 100;
+      } else {
+        return 0;
+      }
+    }
+};
+
 const byte tiempoRebote = 180;
 unsigned long ultimaPresionBtn[] = { 0, 0, 0, 0, 0 };
 unsigned long currentMillis = millis();
@@ -604,6 +661,10 @@ void disparoCamara(){
   irsend.sendNEC(0x20DF10EF, 32);
 }
 */
+
+void pantallaTenis(){
+
+}
 
 
 void setup() {
