@@ -147,6 +147,7 @@ bool pararCrono = true;
 int centecimaCrono = 0;
 int segundoCrono = 0;
 int minutoCrono = 0;
+unsigned long volverInicio = millis();
 
 int trianguloUno = random(23, 32);
 int trianguloDos = random(23, 32);
@@ -209,6 +210,7 @@ bool presionandoBtn(int btn) {
   }
   if (digitalRead(btn) == LOW) {
     currentMillis = millis();
+    volverInicio = millis();
     if (currentMillis - ultimaPresionBtn[nBtn] > tiempoRebote) {
       ultimaPresionBtn[nBtn] = currentMillis;
       return true;
@@ -600,6 +602,15 @@ void pantallaCrono() {
   matrix.write();
 }
 
+void regresarPantallaInicial() {
+  if (millis() - volverInicio > 15000) {
+    volverInicio = millis();
+    if (modo == 2) {
+      guardarAlarmaEeprom();
+    }
+    modo = 0;
+  }
+}
 
 
 
@@ -656,12 +667,14 @@ void loop() {
       break;
     case 1:
       ajustarHora();
+      regresarPantallaInicial();
       break;
     case 2:
       actualizarHoraManual();
       matrix.setIntensity(1);
       ajustarAlarma();
       pantallaAlarma();
+      regresarPantallaInicial();
       break;
     case 3:
       guardarAlarmaEeprom();
@@ -672,6 +685,7 @@ void loop() {
       break;
     case 5:
       modificarBrillo();
+      regresarPantallaInicial();
       break;
     case 6:
       crono();
