@@ -666,6 +666,12 @@ void pantallaTenis(){
 
 }
 
+char letraNombre(int indice){
+   char alfabeto[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return alfabeto[indice];
+
+}
+
 
 void setup() {
   if (configInicial) {
