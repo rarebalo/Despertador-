@@ -217,6 +217,10 @@ int trianguloUnoY = random(0, 8);
 int trianguloDosY = random(0, 8);
 int trianguloTresY = random(0, 8);
 
+char nombreChar[6] = ""; 
+int indiceActual = 0; 
+char letraActual = 'A';
+
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
     tiempoInicio = millis();
@@ -671,7 +675,43 @@ void regresarPantallaInicial() {
 
 
 void pantallaTenis(){
+  //pregunta, nuevo jugador? y/n
+  //y: agrego un nuevo jugador n: selecciono jugadores guardados
+  //comenzar partida y/n
+  //y: seleccionar jugador 1, jugador 2 n: volver a la primera pregunta
+  //comienza el juego el jugador 1 saca
+  //finaliza el juego: muestra las estadisticas del jugador ganador pregunta: otra partida? y/n
+  //y: repite lo anterios n: vuelve al comienzo
+  // debe tener un menu para encontrar un jugador y revisar lasestadisticas
 
+}
+
+char letraNombre(int indice){
+   char alfabeto[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return alfabeto[indice];
+
+}
+
+char nombreGenerado() {
+  if (presionandoBtn(button1)) {
+    letraActual++;
+    if (letraActual > 'Z') {
+      letraActual = 'A';
+    }
+  } else if (presionandoBtn(button2)) {
+    if (indiceActual < 5) {
+      nombreChar[indiceActual] = letraActual;
+      indiceActual++;
+      nombreChar[indiceActual] = '\0'; 
+    }
+  } else if (presionandoBtn(button3)) {
+    if (indiceActual > 0) {
+      indiceActual--;
+      nombreChar[indiceActual] = '\0';
+    }
+  } else if (presionandoBtn(button4)) {
+    return nombreChar;
+  }
 }
 
 
