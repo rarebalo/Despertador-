@@ -667,6 +667,14 @@ void disparoCamara(){
 */
 
 void pantallaTenis(){
+  //pregunta, nuevo jugador? y/n
+  //y: agrego un nuevo jugador n: selecciono jugadores guardados
+  //comenzar partida y/n
+  //y: seleccionar jugador 1, jugador 2 n: volver a la primera pregunta
+  //comienza el juego el jugador 1 saca
+  //finaliza el juego: muestra las estadisticas del jugador ganador pregunta: otra partida? y/n
+  //y: repite lo anterios n: vuelve al comienzo
+  // debe tener un menu para encontrar un jugador y revisar lasestadisticas
 
 }
 
