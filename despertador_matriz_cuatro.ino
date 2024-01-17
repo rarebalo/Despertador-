@@ -714,6 +714,9 @@ char nombreGenerado() {
   }
 }
 
+void nuevoJugador(){
+  Jugador* nuevoJugador = new Jugador(String(nombreGenerado()));
+}
 
 void setup() {
   if (configInicial) {
