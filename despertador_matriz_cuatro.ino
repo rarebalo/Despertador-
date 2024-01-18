@@ -219,6 +219,9 @@ int trianguloTresY = random(0, 8);
 char nombreChar[6] = ""; 
 int indiceActual = 0; 
 char letraActual = 'A';
+String mensajeDeInicio = "Agregar nuevo jugador?";
+String jugadores[] = {};
+
 
 bool ejecutarCada(int tiempo) {
   if (millis() - tiempoInicio >= tiempo) {
@@ -667,6 +670,15 @@ void disparoCamara(){
 */
 
 void pantallaTenis(){
+  if(presionandoBtn(button1)){
+    //agrego un nuevo jugador
+  }else if(presionandoBtn(button2)) {
+    //selecciono los jugadores con los cuales jugar
+  }else{
+    //muestro por pantalla el mensaje de inicio
+    mensajeDeInicio;
+  }
+  
   //pregunta, nuevo jugador? y/n
   //y: agrego un nuevo jugador n: selecciono jugadores guardados
   //comenzar partida y/n
