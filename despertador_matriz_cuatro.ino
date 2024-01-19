@@ -221,6 +221,7 @@ int indiceActual = 0;
 char letraActual = 'A';
 String mensajeDeInicio = "Agregar nuevo jugador?";
 String jugadores[] = {};
+int mostrarPantallaTennis = 0;
 
 
 bool ejecutarCada(int tiempo) {
@@ -671,13 +672,29 @@ void disparoCamara(){
 
 void pantallaTenis(){
   if(presionandoBtn(button1)){
-    //agrego un nuevo jugador
+    mostrarPantallaTennis = 1;
   }else if(presionandoBtn(button2)) {
-    //selecciono los jugadores con los cuales jugar
+    mostrarPantallaTennis = 2;
   }else{
-    //muestro por pantalla el mensaje de inicio
-    mensajeDeInicio;
+    mostrarPantallaTennis = 3;
   }
+
+  switch(mostrarPantallaTennis){
+    case 1:
+    break;
+
+    case 2:
+    break;
+
+    case 3:
+    mostrarPantallaTennis;
+    break;
+
+    case 4:
+    break;
+  }
+
+  
   
   //pregunta, nuevo jugador? y/n
   //y: agrego un nuevo jugador n: selecciono jugadores guardados
